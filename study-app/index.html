@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vanshika's Interview Hub</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  
+  <style>
+    :root {
+      --bg: #0a0a14;
+      --surface: #12121f;
+      --card: rgba(255, 255, 255, 0.04);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent: #7c3aed;
+      --accent-secondary: #a78bfa;
+      --accent-glow: rgba(124, 58, 237, 0.3);
+      --success: #10b981;
+      --warning: #f59e0b;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --sidebar-width: 260px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--surface);
+      border-right: 1px solid var(--card-border);
+      display: flex;
+      flex-direction: column;
+      padding: 24px 16px;
+      z-index: 10;
+      overflow-y: auto;
+    }
+
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 4px; }
+
+    .logo {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo span {
+      background: linear-gradient(135deg, var(--accent-secondary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: 12px;
+      margin-bottom: 4px;
+      transition: all 0.2s ease;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      background: var(--card);
+      color: var(--text);
+    }
+    
+    .nav-link.active {
+      background: var(--accent-glow);
+      color: var(--accent-secondary);
+      border: 1px solid var(--accent);
+    }
+
+    /* Main Area */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Topbar */
+    .topbar {
+      height: 72px;
+      background: rgba(18, 18, 31, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      z-index: 5;
+    }
+
+    .streak-container {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .streak-text {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--warning);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .calendar-dots {
+      display: flex;
+      gap: 4px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--card-border);
+    }
+    .dot.active {
+      background: var(--success);
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn:hover { background: rgba(255,255,255,0.1); }
+    .btn-primary { background: var(--accent); border-color: var(--accent); }
+    .btn-primary:hover { background: #6d28d9; }
+
+    /* Content Area */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 40px;
+      scroll-behavior: smooth;
+    }
+
+    .content::-webkit-scrollbar { width: 8px; }
+    .content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 8px; }
+
+    .section {
+      display: none;
+      max-width: 900px;
+      margin: 0 auto;
+      animation: fadeIn 0.3s ease forwards;
+    }
+    
+    .section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-header {
+      margin-bottom: 32px;
+    }
+
+    .section-title {
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    /* Progress */
+    .progress-container {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .progress-bar-bg {
+      flex: 1;
+      height: 8px;
+      background: rgba(0,0,0,0.5);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--success);
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    .progress-text {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 600;
+      min-width: 45px;
+    }
+
+    /* Tips */
+    .tip-card {
+      background: rgba(245, 158, 11, 0.1);
+      border-left: 4px solid var(--warning);
+      padding: 16px 20px;
+      border-radius: 0 12px 12px 0;
+      margin-bottom: 24px;
+      display: flex;
+      gap: 12px;
+    }
+    .tip-icon { font-size: 20px; }
+    .tip-content { font-size: 14px; line-height: 1.6; color: #fef3c7; }
+
+    /* Accordion */
+    .qna-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      margin-bottom: 16px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .qna-card:hover {
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    .qna-header {
+      padding: 20px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+    }
+
+    .q-text {
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.5;
+      padding-right: 16px;
+      flex: 1;
+    }
+
+    .qna-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .reviewed-cb {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      accent-color: var(--success);
+    }
+
+    .chevron {
+      transition: transform 0.3s ease;
+      color: var(--text-muted);
+    }
+
+    .qna-card.expanded .chevron {
+      transform: rotate(180deg);
+    }
+
+    .qna-body {
+      padding: 0 20px;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.4s ease, opacity 0.3s ease;
+    }
+
+    .qna-card.expanded .qna-body {
+      padding: 0 20px 20px 20px;
+      opacity: 1;
+      max-height: 2000px;
+    }
+
+    .answer {
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+    
+    .answer strong { color: var(--text); }
+    .answer code { background: rgba(0,0,0,0.5); padding: 2px 6px; border-radius: 4px; color: var(--accent-secondary); }
+
+    .mermaid-wrapper {
+      background: #000;
+      border-radius: 12px;
+      padding: 16px;
+      margin: 16px 0;
+      overflow-x: auto;
+    }
+
+    /* Follow ups */
+    .follow-up {
+      margin-top: 16px;
+      padding-left: 16px;
+      border-left: 2px solid var(--accent);
+    }
+    
+    .follow-up-q {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    
+    .follow-up-a {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-muted);
+    }
+
+    /* Dashboard specific */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--accent-secondary);
+      margin-bottom: 8px;
+    }
+    .stat-label {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Sticky Notes */
+    .sticky-notes-panel {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 340px;
+      background: rgba(18, 18, 31, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      transform: translateY(120%);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .sticky-notes-panel.open { transform: translateY(0); }
+
+    .sticky-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.02);
+      border-radius: 16px 16px 0 0;
+    }
+    .sticky-title { font-weight: 600; display: flex; gap: 8px; align-items: center; }
+    
+    .sticky-body {
+      padding: 16px;
+    }
+    .sticky-textarea {
+      width: 100%;
+      height: 200px;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.6;
+      resize: none;
+      outline: none;
+    }
+    .sticky-footer {
+      padding: 12px 16px;
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .fab {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px var(--accent-glow);
+      z-index: 99;
+      border: none;
+      transition: transform 0.2s;
+    }
+    .fab:hover { transform: scale(1.05); }
+
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="logo">
+      ✨ <span>Interview Hub</span>
+    </div>
+    <nav id="nav-links">
+      <!-- Generated by JS -->
+    </nav>
+  </aside>
+
+  <main class="main-wrapper">
+    <header class="topbar">
+      <div class="streak-container">
+        <div class="streak-text">
+          🔥 <span id="streak-count">0</span> Day Streak
+        </div>
+        <div class="calendar-dots" id="calendar-dots">
+          <!-- Dots generated via JS -->
+        </div>
+      </div>
+      <div style="display: flex; gap: 16px; align-items: center;">
+        <span id="current-date" style="color: var(--text-muted); font-weight: 500; font-size: 14px;"></span>
+        <button class="btn btn-primary" id="btn-mark-today">Mark Today Studied</button>
+      </div>
+    </header>
+
+    <div class="content" id="content-area">
+      <!-- Sections generated by JS -->
+    </div>
+  </main>
+
+  <button class="fab" id="fab-notes">📝</button>
+
+  <div class="sticky-notes-panel" id="notes-panel">
+    <div class="sticky-header">
+      <div class="sticky-title">📝 My Notes</div>
+      <button class="btn" style="padding: 4px 8px; font-size: 12px;" id="btn-clear-notes">Clear</button>
+    </div>
+    <div class="sticky-body">
+      <textarea class="sticky-textarea" id="notes-textarea" placeholder="Jot down quick thoughts, answers you forget, or things to look up..."></textarea>
+    </div>
+    <div class="sticky-footer">
+      <span id="notes-status">Saved</span>
+    </div>
+  </div>
+
+  <script>
+    const data = [
+      {
+        id: "dashboard",
+        title: "Dashboard",
+        icon: "🏠",
+        isDashboard: true
+      },
+      {
+        id: "ragos",
+        title: "RAGOS",
+        icon: "🚀",
+        tips: [
+          "When they ask about RAGOS, lead with the architecture decision—not the definition of RAG.",
+          "The 'hardest bug' question is guaranteed. Prepare: 'Async experiments writing to the same ChromaDB collection caused race conditions—I had to implement per-experiment collection namespacing.'"
+        ],
+        items: [
+          {
+            q: "What is RAGOS? Give me the pitch.",
+            a: "RAGOS is an 'AutoML for RAG'—a framework-agnostic platform that automatically searches for the optimal RAG pipeline configuration under user-specified constraints. Instead of manually tuning chunk sizes, retrieval strategies, and generation models, you submit declarative objectives like 'maximize faithfulness, latency ≤ 500ms, cost ≤ $0.01/query', and the engine runs constraint-aware Random Search across 100+ configurations, evaluating each one automatically, and returns a Pareto-optimal set of pipelines.",
+            diagram: `flowchart TD\n    A[POST /experiments] --> B[Pydantic Validation]\n    B --> C[Store in PostgreSQL]\n    C --> D[optimizer.py]\n    D --> E[Sample Config]\n    E --> F{Constraint Check}\n    F -- Violates --> E\n    F -- OK --> G[experiments/runner.py]\n    G --> H[Ingest + Embed]\n    H --> I[ChromaDB]\n    I --> J[Retrieve]\n    J --> K[Generate via LiteLLM]\n    K --> L[Evaluate]\n    L --> M[Store Result]\n    M --> D\n    D --> N[pareto.py]\n    N --> O[Return Pareto Set]`,
+            followUps: [
+              {
+                q: "Why Random Search over Grid Search or Bayesian Optimization?",
+                a: "Grid Search is exponential in the number of hyperparameters—with 5 dimensions at 5 values each, you need 3125 trials. Random Search achieves comparable results with far fewer trials because in high-dimensional spaces, a random sample covers the space well. Bayesian Optimization (TPE, Gaussian Processes) would be better for exploitation, but it adds significant complexity and requires a large initial sample to build a good surrogate model. Random Search is a pragmatic starting point that gives good results fast."
+              },
+              {
+                q: "What does 'constraint-aware' specifically mean in your implementation?",
+                a: "Before executing a trial, the optimizer checks the sampled configuration against the user's constraints—latency budget, cost budget, local-only flag. Configurations that obviously violate constraints (e.g., cloud-only model when local_only=True) are filtered before execution, saving unnecessary API calls. After execution, measured latency and cost are checked against constraints, and constraint-violating results are excluded from the Pareto frontier."
+              },
+              {
+                q: "What is a Pareto frontier and why use it instead of a single weighted score?",
+                a: "A Pareto frontier contains all configurations that are not dominated by any other. Config A dominates Config B if A is at least as good in all dimensions and strictly better in at least one. The frontier exposes the true tradeoffs—a 500ms config at $0.001 vs a 200ms config at $0.005—and lets the user choose based on their priorities. A weighted score collapses this into a single value, which forces you to decide weights upfront and hides the actual tradeoffs."
+              },
+              {
+                q: "How does the plugin architecture work? How would I add a new retriever?",
+                a: "The core/interfaces.py defines abstract base classes—BaseRetriever, BaseEmbedder, BaseGenerator, BaseEvaluator. Each has a required interface (e.g., retrieve(query, k) → List[Document]). To add a new retriever, you implement BaseRetriever and register it in plugins.py. The optimizer works only with the abstract interface, so it never needs to know about concrete implementations. This is the Open/Closed Principle—the optimization engine is closed for modification but open for extension."
+              },
+              {
+                q: "What if all 100+ configurations violate the constraints?",
+                a: "The optimizer returns an empty Pareto set with an explanatory message. The API would return a 200 with a constraint_violations field explaining which constraints are impossible to satisfy simultaneously—e.g., latency ≤ 100ms AND faithfulness ≥ 0.9 might be mutually exclusive with the available models. The user must relax constraints and re-run."
+              },
+              {
+                q: "How does automated evaluation work? How reliable is LLM-as-judge?",
+                a: "Each trial runs the RAG pipeline on a test query set, then the evaluator (evaluation/judge.py) sends the generated answer, the retrieved context, and the ground truth to an LLM and asks it to score faithfulness (does the answer stay true to the context?) and relevance (does it address the question?). Reliability is a known limitation—LLM-as-judge has positional bias and verbosity bias. For high-stakes evaluation, you'd want RAGAS with multiple judges and human validation. For automated hyperparameter search, it's directionally accurate enough."
+              },
+              {
+                q: "RAGOS architecture—walk me through the request flow end-to-end.",
+                a: "(1) User submits POST /experiments with constraints JSON. (2) FastAPI validates via Pydantic, stores experiment spec in PostgreSQL. (3) The optimizer.py samples configurations from dimensions.py, filters via constraints.py. (4) For each config, experiments/runner.py executes the full RAG pipeline: ingest documents → embed → store in ChromaDB → retrieve → generate via LiteLLM. (5) Evaluator scores the result. (6) Cost tracker logs token usage. (7) Results stored in PostgreSQL. (8) After all trials, pareto.py computes the frontier. (9) GET /experiments/{id} returns results with Pareto set."
+              },
+              {
+                q: "Why PostgreSQL AND ChromaDB? What goes where?",
+                a: "PostgreSQL stores structured, relational data—experiment metadata, configuration parameters, evaluation scores, cost logs, user data. ChromaDB stores vector embeddings—the actual embedding vectors for document chunks, indexed for ANN similarity search. They serve fundamentally different access patterns: PostgreSQL for filtering, joining, aggregating; ChromaDB for nearest-neighbor lookup in high-dimensional space."
+              },
+              {
+                q: "What happens if ChromaDB goes down mid-experiment?",
+                a: "The trial fails with an exception. The runner should catch it, mark the trial as FAILED in PostgreSQL, and continue with remaining trials. A retry mechanism could re-attempt failed trials. The experiment would complete with fewer results, with failed trials clearly marked."
+              }
+            ]
+          },
+          {
+            q: "What would you change if you rebuilt RAGOS today?",
+            a: "Four things: (1) Replace Random Search with Bayesian Optimization using Optuna—it would find good configurations with 3-5x fewer trials. (2) Add distributed execution via Celery so trials run on multiple workers in parallel. (3) Replace LLM-as-judge with RAGAS framework for more reliable evaluation. (4) Add real-time progress streaming via WebSockets instead of polling for results."
+          }
+        ]
+      },
+      {
+        id: "llm_cost_guard",
+        title: "LLM Cost Guard",
+        icon: "💰",
+        tips: [
+          "The Redis Lua script question is the #1 differentiator. Know TOCTOU cold.",
+          "If they push on K8s/AWS depth: 'I containerized everything and wrote K8s manifests for local Minikube deployment to ensure cloud-native architecture. Production-scale K8s ops is something I'm actively learning.'"
+        ],
+        items: [
+          {
+            q: "Explain the core problem LLM Cost Guard solves.",
+            a: "LLM APIs are expensive and unpredictable in multi-tenant environments. Without centralized control, any service can make unlimited LLM calls, budgets get blown, and there's no visibility into who's spending what. LLM Cost Guard is a proxy gateway—all LLM traffic goes through it. It enforces per-organization token budgets, routes intelligently to the cheapest or fastest provider, and caches semantically similar requests.",
+            diagram: `sequenceDiagram\n    participant C as Client\n    participant G as Gateway\n    participant R as Redis\n    participant Q as RabbitMQ\n    participant P as Provider\n    participant W as Celery Worker\n\n    C->>G: POST /v1/completions\n    G->>R: Auth + Policy Check\n    G->>R: Lua Script: Reserve Tokens\n    alt Budget Exceeded\n        R-->>G: 429\n        G-->>C: Error\n    end\n    G->>R: Semantic Cache Lookup\n    alt Cache Hit\n        G-->>C: Cached Response\n    end\n    G->>P: Call LLM API\n    P-->>G: Response + Usage\n    G-->>C: Stream Response\n    G->>Q: Enqueue reconciliation task\n    W->>R: Reconcile token budget\n    W->>G: Log to PostgreSQL`,
+            followUps: [
+              {
+                q: "What is TOCTOU and how does it apply here?",
+                a: "Time-of-Check-Time-of-Use. When you read a value, check if it's valid, then act on it as two separate operations, a race condition exists in between. For token budgets: Request A reads budget=1000, Request B reads budget=1000. A checks '1000 ≥ 600', proceeds. B checks '1000 ≥ 800', proceeds. A writes 400. B writes 200. We've authorized 1400 tokens against a 1000 budget. The check and the use were not atomic."
+              },
+              {
+                q: "How does a Redis Lua script solve TOCTOU specifically?",
+                a: "Redis executes Lua scripts atomically—the entire script runs within Redis's single-threaded event loop without any other command executing in between. So 'read → check → decrement' is a single atomic unit. No other request can read the budget between our read and our write. O(1) latency even under high concurrency, with no retries needed."
+              },
+              {
+                q: "Why Lua over WATCH/MULTI/EXEC (Redis transactions)?",
+                a: "WATCH/MULTI/EXEC uses optimistic locking—if the watched key changes between WATCH and EXEC, the transaction fails and the client must retry. Under high contention (100+ concurrent requests to the same budget), almost every transaction fails, causing cascading retries and CPU spikes. Lua scripts have no such retry—they always succeed atomically."
+              },
+              {
+                q: "Walk through the Lua script step by step.",
+                a: "(1) Read current budget value from key `budget:{org_id}:{window}`. (2) If key doesn't exist, initialize to max_budget. (3) Compare current_budget to requested_tokens. (4) If current_budget < requested_tokens, return error (429). (5) Decrement: SET the key to current_budget - requested_tokens. (6) Reset TTL for the window. (7) Return success with new balance. All 7 steps execute atomically."
+              },
+              {
+                q: "What happens if the LLM call fails after token reservation?",
+                a: "The gateway catches the exception and dispatches a Celery task to refund the reserved tokens—incrementing the budget key back. This is the 'reconcile' in reserve-and-reconcile. If the refund Celery task itself fails, RabbitMQ re-queues it (acks_late=True) for another worker. If it fails repeatedly, it goes to a Dead Letter Queue for manual review."
+              },
+              {
+                q: "What about the 7,100+ concurrent integration tests?",
+                a: "I used Locust (locustfile.py in the repo). The test spawns 7,100 concurrent virtual users, all hitting the token reservation endpoint simultaneously. Validation: final_budget = initial_budget - sum(all_successful_reservations). Any discrepancy indicates a double-charge or lost reservation. The results CSV in the repo shows zero failures—the budget arithmetic was always correct."
+              }
+            ]
+          },
+          {
+            q: "Explain the circuit breaker. What states does it have?",
+            a: "Three states: (1) CLOSED—normal operation, requests flow through. (2) OPEN—provider is failing, all requests fail immediately without hitting the provider. (3) HALF-OPEN—after a timeout, one probe request is allowed through. If it succeeds, circuit closes; if it fails, it re-opens. State is stored in Redis so all gateway instances share it. This prevents cascading failures when an LLM provider has an outage."
+          },
+          {
+            q: "What is semantic caching and why does it help?",
+            a: "If two requests are semantically similar ('What is Python?' and 'Explain the Python language'), we can return the cached response for the second without calling the LLM. Implementation: embed the incoming query, search the cache (Redis RediSearch or pgvector) for embeddings with cosine similarity above a threshold (e.g., 0.95). If hit, return cached response. Dramatically reduces costs for repetitive queries in chatbot-style applications.",
+            followUps: [
+              {
+                q: "What threshold do you use for 'similar enough'?",
+                a: "0.95 cosine similarity is a reasonable starting point. Too low (0.80) and you return cached answers for different questions. Too high (0.99) and you never hit the cache. The optimal threshold depends on the domain—highly technical queries need higher thresholds because small wording differences can mean different things."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: "focus_lock",
+        title: "Focus Lock",
+        icon: "🔒",
+        tips: [
+          "Shannon entropy is your strongest technical differentiator in this project. Derive the formula if asked.",
+          "97.2% recall—be ready to say what dataset, what evaluation script, what the precision was (~89%), and what the F1 was (~93%)."
+        ],
+        items: [
+          {
+            q: "What does Focus Lock do in one sentence?",
+            a: "Focus Lock is a privacy-first, on-device AI system that uses YOLOv8 and MediaPipe to detect distractions (phone use, gaze away), runs them through a Finite State Machine to determine focus state, and adapts inference frequency using Shannon entropy to cut CPU usage by 93%—all locally, no cloud.",
+            diagram: `flowchart LR\n    CT[Camera Thread] -->|queue.Queue| IT\n    IT[Inference Thread] -->|entropy check| S{Entropy > threshold?}\n    S -- No, skip --> IT\n    S -- Yes --> YO[YOLOv8]\n    S -- Yes --> MP[MediaPipe]\n    YO --> FS[Focus Score]\n    MP --> FS\n    FS --> FSM[FocusFSM]\n    FSM --> EB[EventBus]\n    EB --> DB[SQLite Writer]\n    EB --> WS[WebSocket Dashboard]\n    EB --> AE[Analytics Engine]`,
+            followUps: [
+              {
+                q: "What is Shannon entropy and how do you use it for adaptive sampling?",
+                a: "Shannon entropy measures information uncertainty: H = -Σ p(x) log₂ p(x). Applied to video frames: I convert a frame to grayscale, compute the absolute difference from the previous frame, generate a histogram of the difference image, normalize it to a probability distribution, and compute entropy. High entropy = complex pixel changes = motion → run YOLO. Low entropy = uniform difference = stillness → skip YOLO, reuse previous state. This means during deep work (person sitting still), YOLO runs maybe 2% of frames instead of every frame."
+              },
+              {
+                q: "Why entropy on the DIFFERENCE image, not the frame itself?",
+                a: "A textured static background (bookshelf) has high entropy on its own. The difference image eliminates static elements—only changes survive. High entropy on the difference = real motion. Low entropy = everything stayed the same. This makes the signal motion-specific, not texture-specific."
+              },
+              {
+                q: "Why entropy over frame differencing or optical flow?",
+                a: "Frame differencing counts pixels above a threshold—it's sensitive to global lighting shifts (a cloud passing = all pixels change slightly = triggers inference). Optical flow (Lucas-Kanade) computes per-pixel motion vectors—accurate but computationally heavier than the YOLO inference we're trying to skip. Entropy captures the complexity of motion: a global lighting shift produces low-entropy uniform differences; localized human motion produces high-entropy complex differences."
+              },
+              {
+                q: "93% CPU reduction—prove it.",
+                a: "Baseline: YOLOv8n + MediaPipe running on every frame at 30 FPS. Optimized: entropy sampler checks each frame; during a stationary work session, entropy stays below threshold ~93% of the time, so YOLO/MediaPipe are skipped ~93% of frames. CPU measurement via Python's `resource` module or system profiler over a 10-minute session. The 93% is specific to a low-motion scenario (sitting and typing). During active movement, the ratio drops—inference fires more often."
+              },
+              {
+                q: "Wait—if you skip frames when still, how do you catch a user frozen while staring at their phone?",
+                a: "Two safeguards: (1) The FocusFSM implements a periodic 'liveness check'—every N seconds regardless of entropy, one inference frame is forced. (2) The entropy threshold is tuned low enough that picking up a phone (significant motion event) always triggers inference. The frozen-phone edge case is mitigated by the liveness check interval."
+              },
+              {
+                q: "How does YOLOv8 work differently from older YOLO versions?",
+                a: "YOLOv8 is anchor-free. Older YOLO versions predicted bounding boxes relative to predefined anchor boxes. YOLOv8 directly predicts object center coordinates, eliminating anchor configuration complexity. It uses a CSPDarknet backbone, decoupled detection head (separate branches for objectness, classification, regression), and achieves faster NMS because there are fewer candidate boxes."
+              },
+              {
+                q: "What is NMS?",
+                a: "Non-Maximum Suppression. The network predicts many overlapping boxes for the same object. NMS keeps the box with the highest confidence score and discards all boxes that have IoU (Intersection over Union) with it above a threshold. Without NMS, you'd get 50 boxes around the same phone."
+              },
+              {
+                q: "How do you combine YOLO detection + MediaPipe gaze into a focus score?",
+                a: "YOLO outputs: is a phone in frame? Where? MediaPipe outputs: roll/pitch/yaw head angles. The scoring/focus_score.py weights these: gaze direction has high weight (looking away from screen = distracted), phone detection is binary high-penalty. The FocusFSM receives the focus score and transitions states: if score drops below FOCUS_THRESHOLD for N consecutive frames, transition FOCUSED → DISTRACTED."
+              },
+              {
+                q: "Walk through the thread model.",
+                a: "Four threads: (1) Camera Thread (capture/camera.py)—reads frames from OpenCV VideoCapture, puts them in queue.Queue. (2) Inference Thread (detection/)—reads from queue, runs entropy check, conditionally runs YOLO + MediaPipe, computes focus score, fires events to EventBus. (3) Flask/WebSocket Thread (serve.py)—handles dashboard WebSocket connections, receives events from EventBus, pushes to browser. (4) SQLite Writer Thread (data/sqlite_writer.py)—batches events, writes to SQLite periodically. Why threads not asyncio? OpenCV and YOLO inference are blocking/CPU-bound; asyncio's single-threaded event loop would starve on blocking calls."
+              },
+              {
+                q: "Python has the GIL—doesn't that break your threading model?",
+                a: "The GIL prevents two Python threads from executing Python bytecode simultaneously. But: (1) OpenCV's VideoCapture is implemented in C++ and releases the GIL during I/O. (2) YOLOv8 inference via ONNX/OpenVINO releases the GIL during the C++ forward pass. (3) SQLite writes release the GIL during disk I/O. So the threads do achieve real parallelism for the heavy operations—only the Python glue code serializes."
+              }
+            ]
+          },
+          {
+            q: "What is the FocusFSM?",
+            a: "A Finite State Machine with 4 states: IDLE (app started, no session), FOCUSED (working, gaze on screen, no distractions), DISTRACTED (phone detected, gaze away), BREAK (explicit break mode). Transitions are debounced—you need N consecutive signals before a state change to prevent flickering. DISTRACTED for >X seconds triggers the lock_screen.py overlay.",
+            diagram: `stateDiagram-v2\n    [*] --> IDLE\n    IDLE --> FOCUSED: Session Started\n    FOCUSED --> DISTRACTED: Low score N frames\n    DISTRACTED --> FOCUSED: Score recovers\n    DISTRACTED --> LOCK: Phone detected > X sec\n    LOCK --> DISTRACTED: Overlay dismissed\n    FOCUSED --> BREAK: User triggers break\n    BREAK --> FOCUSED: Break ends`
+          }
+        ]
+      },
+      {
+        id: "experience",
+        title: "Experience",
+        icon: "💼",
+        tips: [],
+        items: [
+          {
+            q: "Tell me about your Cordum open source contribution.",
+            a: "I contributed a merged PR that redesigned the LLM policy enforcement pipeline. The original was synchronous—every LLM execution blocked on an HTTP round-trip to the policy service. I replaced it with an async job pipeline: the sidecar (cordum-langchain-guard) queues policy evaluation as a job, and the execution path is no longer blocked. The PR includes deterministic 403 handling for policy violations and passed all 26/26 integration tests.",
+            followUps: [
+              {
+                q: "One PR—how significant was that really?",
+                a: "Significant enough to be merged into a production open-source codebase after review. Understanding Cordum's architecture well enough to redesign a core pipeline—not just fix a bug—required deep codebase study. The 26/26 test pass rate means I understood all the integration contracts. The async refactor is architecturally non-trivial: changing synchronous to asynchronous changes the consistency model."
+              },
+              {
+                q: "What is a sidecar pattern?",
+                a: "A sidecar is a separate service/process deployed alongside the main application to provide supporting functionality without modifying the main service. Unlike a library (which requires code changes), a sidecar is a separate process communicating via a defined interface (HTTP, gRPC, socket). Cordum-langchain-guard runs as a separate Python process. It intercepts LangChain LLM calls and applies policy logic."
+              },
+              {
+                q: "What changes when you go from synchronous to asynchronous policy enforcement?",
+                a: "The consistency model. Synchronous: guaranteed that policy is checked before LLM call starts—no unauthorized calls ever execute. Asynchronous: LLM call might start before policy result returns—if policy denies, you need compensating logic (stop the execution, flag it). Async is faster but requires careful design of the 'deny after start' path."
+              }
+            ]
+          },
+          {
+            q: "Tell me about your research internship.",
+            a: "10 months at NIT Jamshedpur and IIT Guwahati working on underwater autonomous vehicles—ROVs (Remotely Operated, tethered, human-controlled) and AUVs (Autonomous, untethered, self-navigating). I built 20+ simulation pipelines in Python and C++ within the ArduPilot/ArduSub ecosystem, and integrated OpenCV vision modules for underwater feature tracking.",
+            followUps: [
+              {
+                q: "What is ArduPilot?",
+                a: "Open-source autopilot firmware supporting drones, submarines (ArduSub), rovers, and planes. It handles navigation, stabilization, sensor fusion. The simulation environment (SITL—Software In The Loop) runs the actual ArduPilot code against a virtual vehicle model, so you can test without risking hardware."
+              },
+              {
+                q: "Why simulation pipelines instead of testing on real hardware?",
+                a: "Cost (real ROVs are expensive), safety (underwater hardware failures are unrecoverable), repeatability (same initial conditions every run), and speed (no water tank required). SITL lets you test thousands of mission scenarios, edge cases, and failure modes that would be impractical or dangerous in real water."
+              },
+              {
+                q: "What made underwater vision specifically hard?",
+                a: "Four compounding problems: (1) Turbidity—particles scatter light, reducing visibility distance. (2) Color absorption—red light absorbs first at depth, so underwater images are blue-green dominated. (3) Uneven lighting—single point light sources create harsh shadows. (4) Dynamic underwater movement—vehicle motion, currents, and target movement combined. Classical OpenCV feature detectors (SIFT, ORB) struggle with low-contrast, blue-tinted, blurry underwater frames."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: "tech_defense",
+        title: "Tech Defense",
+        icon: "🛡️",
+        tips: [
+          "Redis and Docker are asked in 90%+ of backend interviews. Know Redis Lua scripts cold."
+        ],
+        items: [
+          {
+            q: "What is Redis? Why use it instead of a Python dict?",
+            a: "Redis is an in-memory data structure store used as a distributed cache, database, and message broker. A Python dict is process-local—4 FastAPI workers don't share it. Redis provides centralized, shared state accessible from all workers with microsecond latency.",
+            followUps: [
+              { q: "What data structures does Redis support?", a: "Strings, Lists, Sets, Sorted Sets, Hashes, Bitmaps, HyperLogLog, Streams. Sorted Sets are useful for leaderboards and time-series data. Hashes for storing object fields. Strings for counters and cached values." },
+              { q: "How does Redis achieve atomicity without locks?", a: "Redis is single-threaded for command execution. Each command executes completely before the next begins. Lua scripts extend this—the entire script runs as one atomic unit in the single thread. No mutex needed because there's only one thread executing commands." },
+              { q: "Redis persistence—RDB vs AOF?", a: "RDB: point-in-time snapshot at intervals. Fast recovery, but can lose data between snapshots. AOF: log every write command. Durable (fsync=always = zero data loss), but slower and larger files. Production recommendation: both—RDB for fast restart, AOF for durability." },
+              { q: "What if Redis goes down? Fail-open or fail-closed?", a: "Depends on the use case. For LLM Cost Guard's rate limiting: fail-open (let requests through without rate limiting) preserves availability but risks budget overruns. Fail-closed (reject all requests) protects budget but causes downtime. Design choice should be explicit with monitoring/alerts." },
+              { q: "How do you scale Redis?", a: "Read scaling: replica sets with async replication. HA: Redis Sentinel (monitors, auto-promotes replica on master failure). Write scaling + data size: Redis Cluster (shards data across nodes using hash slots, CRC16 mod 16384). Note: Lua scripts in Redis Cluster require all keys to be on the same shard—use hash tags {key} to force co-location." }
+            ]
+          },
+          {
+            q: "Explain Docker's layer caching.",
+            a: "Each Dockerfile instruction creates an immutable layer. Docker caches layers. If a layer's instruction and its inputs haven't changed, Docker reuses the cached layer. This is why you copy requirements.txt before source code—the pip install layer is cached across code changes. Change source code? Only the final COPY layer rebuilds. Change requirements? Everything from pip install down rebuilds.",
+            followUps: [
+              { q: "What is a multi-stage build?", a: "Use multiple FROM instructions. First stage (builder): install build tools, compile C extensions. Second stage (runtime): start from a clean base image, COPY only the compiled artifacts from builder. Result: production image has no build tools (gcc, make), dramatically smaller—sometimes 1GB → 50MB." }
+            ]
+          },
+          {
+            q: "FastAPI vs Flask—when would you choose Flask?",
+            a: "Flask when: you need simplicity and have no async requirements, extensive plugin ecosystem matters (Flask-SQLAlchemy, Flask-Login), team is more familiar with it, or you're building a server-side rendered web app. FastAPI when: you need async endpoints, automatic OpenAPI docs, Pydantic validation, or high-throughput JSON APIs. For AI services making async LLM calls, FastAPI is almost always the right choice."
+          },
+          {
+            q: "PostgreSQL MVCC—what is it?",
+            a: "Multi-Version Concurrency Control. Instead of locking rows during writes, PostgreSQL creates a new version of the row. Readers see the old version while writers work on the new one. This eliminates read-write contention. Old versions are cleaned up by VACUUM. Each transaction sees a consistent snapshot of the database as of its start time.",
+            followUps: [
+              { q: "What is EXPLAIN ANALYZE?", a: "Executes a query and shows the actual execution plan with real timing. Look for: Seq Scan on large tables (missing index), high row estimates (stale statistics—run ANALYZE), nested loop joins on large datasets (might need hash join), high actual vs estimated rows (bad statistics)." }
+            ]
+          }
+        ]
+      },
+      {
+        id: "os",
+        title: "OS",
+        icon: "💻",
+        tips: [
+          "Process vs Thread is question #1 in OS. Mention TLB and cache invalidation for context switch cost—this is what separates prepared candidates."
+        ],
+        items: [
+          {
+            q: "Process vs Thread?",
+            a: "Process = isolated execution environment with own memory space (heap, stack, code, data). Thread = unit of execution within a process, shares heap and open files, has own stack and registers. Threads are cheaper to create and context-switch because they share address space (TLB stays valid).",
+            followUps: [
+              { q: "What makes context switching expensive?", a: "Direct cost: saving/restoring registers and program counter. Indirect cost (the real killer): TLB flush (new process's virtual addresses must be re-mapped) and CPU cache invalidation (new process's working set isn't cached). The cache miss storm on the first N instructions after a context switch dominates the cost." }
+            ]
+          },
+          { q: "What is the GIL and how does it affect Python multithreading?", a: "Global Interpreter Lock. A mutex ensuring only one Python thread executes bytecode at a time in CPython. Effect: Python threads don't achieve CPU parallelism for pure Python code. Fix: multiprocessing (separate processes, separate GIL), or use C extensions that release the GIL (NumPy, OpenCV, ONNX inference—which is why Focus Lock's threading model works)." },
+          { q: "Virtual memory—why does it exist?", a: "(1) Isolation: each process thinks it has the entire address space, preventing access to other processes' memory. (2) More memory than physical RAM: pages spilled to disk (swap). (3) Memory-mapped files: map file bytes into virtual address space without explicit read calls. (4) Shared memory: two processes can map the same physical page (e.g., shared libraries)." },
+          { q: "Deadlock—four conditions (Coffman)?", a: "(1) Mutual Exclusion: resource held by exactly one process. (2) Hold and Wait: process holds a resource while waiting for another. (3) No Preemption: resources can't be forcibly taken. (4) Circular Wait: P1 waits for P2, P2 waits for P1. All four must hold simultaneously. Prevention: break any one condition." },
+          { q: "Mutex vs Semaphore?", a: "Mutex: binary lock with ownership—only the thread that locked it can unlock it. Used for critical section protection. Semaphore: counter allowing N concurrent accesses. No ownership concept—any thread can signal. Binary semaphore ≠ mutex because of ownership. Use mutex for mutual exclusion, semaphore for counting resources." }
+        ]
+      },
+      {
+        id: "dbms",
+        title: "DBMS",
+        icon: "🗄️",
+        tips: [
+          "ACID is always asked. Know which property is hardest to achieve (Durability = fsync overhead, Isolation = concurrency tradeoff)."
+        ],
+        items: [
+          {
+            q: "ACID properties?",
+            a: "Atomicity: transaction is all-or-nothing (rollback on failure). Consistency: transaction brings DB from valid state to valid state. Isolation: concurrent transactions don't see each other's intermediate state. Durability: committed transactions survive crashes (WAL/fsync).",
+            followUps: [
+              { q: "What isolation level do you use and why?", a: "READ COMMITTED is PostgreSQL's default—transactions see only committed data, preventing dirty reads, but allowing non-repeatable reads (row changes between two reads in same transaction). SERIALIZABLE prevents all anomalies but reduces throughput. For LLM Cost Guard's usage logs, READ COMMITTED is fine—we don't re-read rows in the same transaction." }
+            ]
+          },
+          { q: "How does a B-tree index work?", a: "B-tree is a self-balancing tree. Leaf nodes hold key-pointer pairs sorted by key. Non-leaf nodes hold routing keys. A SELECT with a WHERE clause on an indexed column: tree traversal O(log n) to find the leaf, then follow pointer to heap. Without index: sequential scan O(n). Index cost: extra storage, slower writes (must update tree on insert/update/delete)." },
+          { q: "EXPLAIN ANALYZE output—what is a Seq Scan?", a: "Sequential Scan = reading every row in the table. Fine for small tables or when selecting >10-20% of rows (index overhead not worth it). Bad for large tables with selective predicates—add an index. The planner chooses Seq Scan when it estimates index is slower (stale statistics can cause wrong choice—run ANALYZE)." }
+        ]
+      },
+      {
+        id: "networks",
+        title: "Networks",
+        icon: "🌐",
+        tips: [
+          "HTTP/HTTPS, DNS, TCP handshake—these come up in every backend interview. Know the 3-way handshake cold."
+        ],
+        items: [
+          { q: "TCP 3-way handshake?", a: "SYN (client → server: 'I want to connect, my seq=x'). SYN-ACK (server → client: 'OK, my seq=y, ack=x+1'). ACK (client → server: 'ack=y+1'). After this, connection is established. Purpose: both sides agree on initial sequence numbers for reliable ordered delivery." },
+          { q: "HTTP/1.1 vs HTTP/2?", a: "HTTP/1.1: one request per connection at a time (head-of-line blocking), text-based headers (verbose), keep-alive for reuse. HTTP/2: multiplexing multiple requests on one connection, binary protocol, header compression (HPACK), server push. HTTP/2 dramatically reduces latency for parallel resource loading." },
+          { q: "What happens when you type a URL and press Enter?", a: "(1) DNS resolution: browser checks cache → OS cache → resolver → root nameserver → TLD → authoritative nameserver → returns IP. (2) TCP connection to IP:443. (3) TLS handshake (for HTTPS). (4) HTTP request sent. (5) Server processes, sends response. (6) Browser parses HTML, requests sub-resources (CSS, JS, images), renders page." },
+          { q: "What is a load balancer?", a: "Distributes incoming traffic across multiple backend servers. Algorithms: Round Robin (each server in turn), Least Connections (server with fewest active connections), IP Hash (same client always routes to same server—useful for session affinity). Layer 4 (TCP level) vs Layer 7 (HTTP level, can route based on URL path/headers)." }
+        ]
+      },
+      {
+        id: "oop",
+        title: "OOP",
+        icon: "🔷",
+        tips: [
+          "SOLID is asked more than the 4 pillars in senior-track interviews. Know Open/Closed Principle—you implemented it in RAGOS's plugin system."
+        ],
+        items: [
+          { q: "4 pillars of OOP?", a: "Encapsulation: bundling data and methods, hiding internal state (private attributes). Abstraction: exposing only necessary interface, hiding complexity (abstract classes, interfaces). Inheritance: child class inherits parent's attributes/methods, enabling reuse. Polymorphism: same interface, different behavior (method overriding, duck typing in Python)." },
+          { q: "SOLID—explain each with a real example.", a: "S—Single Responsibility: a class does one thing (FastAPI router vs business logic vs DB access are separate). O—Open/Closed: open for extension, closed for modification (RAGOS plugin system—add retrievers without touching optimizer). L—Liskov Substitution: subclass must be substitutable for parent (any BaseRetriever implementation works in optimizer). I—Interface Segregation: don't force clients to implement interfaces they don't use. D—Dependency Inversion: depend on abstractions, not concretions (FastAPI Depends() injection)." },
+          { q: "Composition vs Inheritance?", a: "Inheritance: 'is-a' relationship. Tight coupling—child depends on parent's internals. Changing parent breaks children. Composition: 'has-a' relationship. Class contains instances of other classes. Loosely coupled—change the composed class without breaking the outer class. Prefer composition: 'favor composition over inheritance' (GoF). Python's duck typing makes composition natural." }
+        ]
+      },
+      {
+        id: "sql",
+        title: "SQL",
+        icon: "📊",
+        tips: [
+          "Window functions (ROW_NUMBER, RANK, LAG, LEAD) are the #1 SQL interview topic for backend roles. Know them."
+        ],
+        items: [
+          { q: "What is a window function?", a: "Performs calculations across a set of rows related to the current row, without collapsing rows like GROUP BY. Syntax: `FUNCTION() OVER (PARTITION BY col ORDER BY col)`. Examples: ROW_NUMBER() for ranking, LAG()/LEAD() for comparing current row with previous/next, SUM() OVER () for running totals." },
+          { q: "Find the second-highest salary.", a: "`SELECT MAX(salary) FROM employees WHERE salary < (SELECT MAX(salary) FROM employees);` Or with window: `SELECT salary FROM (SELECT salary, DENSE_RANK() OVER (ORDER BY salary DESC) as rnk FROM employees) WHERE rnk = 2;`" },
+          { q: "What is a CTE vs a subquery?", a: "Both produce an intermediate result set. CTE (WITH clause): named, readable, can be referenced multiple times, can be recursive. Subquery: inline, can be harder to read, can't be referenced multiple times without duplication. CTEs improve readability; recursive CTEs enable hierarchical queries (org charts, trees)." },
+          { q: "INNER JOIN vs LEFT JOIN?", a: "INNER JOIN: returns only rows with matching values in BOTH tables. LEFT JOIN: returns all rows from the left table, with NULLs for non-matching right table columns. Use LEFT JOIN when you want all records from the main table regardless of whether a related record exists (e.g., all users, including those with no orders)." }
+        ]
+      },
+      {
+        id: "devops",
+        title: "DevOps",
+        icon: "🐳",
+        tips: [],
+        items: [
+          { q: "Docker vs VM?", a: "VMs virtualize hardware, run a full guest OS kernel—boot in minutes, use gigabytes of RAM. Containers virtualize the OS, share the host kernel—start in milliseconds, use megabytes. VMs provide stronger isolation. Containers are better for microservices, CI/CD, and rapid deployment." },
+          { q: "Git rebase vs merge?", a: "Merge: creates a merge commit, preserves exact history, non-destructive. Rebase: rewrites commits onto target branch tip, linear history, changes commit SHAs (don't rebase shared branches). Use rebase to clean local feature branch before PR, merge to integrate PR into main." },
+          { q: "What is CI/CD?", a: "CI (Continuous Integration): automatically build and test every commit. CD (Continuous Delivery/Deployment): automatically deploy passing builds to staging/production. Key principle: main branch is always deployable. GitHub Actions: YAML workflow triggered on push/PR, runs on ubuntu-latest runner, executes lint + test + build steps." }
+        ]
+      },
+      {
+        id: "hr",
+        title: "HR",
+        icon: "🤝",
+        tips: [],
+        items: [
+          { q: "Tell me about yourself.", a: "Lead with: 'I'm a third-year EE student at NIT Jamshedpur, but my work is in backend systems and AI infrastructure.' Then: one sentence on Cordum contribution, one on strongest project (LLM Cost Guard/RAGOS), close with: 'I'm focused on building systems that are actually reliable at scale—which is why [Company] interests me.'" },
+          { q: "Why EE if you want CS/AI?", a: "'EE and backend are the same problem at different abstraction levels. EE: optimize for power, signal noise, hardware constraints. Backend: optimize for CPU cycles, memory, network latency. My EE training gave me first-principles thinking I apply to every systems design problem. It's a superpower, not a detour.'" },
+          { q: "Your CGPA is 7.57—defend it.", a: "'I optimized for real engineering impact over exam scores. While maintaining a respectable CGPA in a rigorous EE program, I dedicated 30+ hours/week to building complex systems and competing nationally. My 26/26 integration tests at Cordum speak to engineering quality better than a textbook exam.'" },
+          { q: "Biggest weakness?", a: "'I sometimes over-invest in understanding internals before building. I spent days reading HNSW papers before implementing ChromaDB for RAGOS. I've learned to balance 'understand deeply' with 'ship iteratively.'" }
+        ]
+      },
+      {
+        id: "ee_basics",
+        title: "EE Basics",
+        icon: "⚡",
+        tips: [],
+        items: [
+          { q: "How does EE background help in software?", a: "Signal processing → FFT for audio ML, convolutions in CNNs (I used YOLOv8 which is all convolutions). Control systems → PID controllers in ArduPilot ROVs. Digital electronics → understanding CPU architecture, bitwise ops. Power constraints → edge AI optimization (Focus Lock's entropy-based CPU reduction)." },
+          { q: "What is a Fourier Transform?", a: "Decomposes a time-domain signal into constituent frequencies. Time → frequency domain. Used in ML: raw audio is hard to train on; FFT → spectrogram → CNN works well. Convolution in CNNs is related: in frequency domain, convolution becomes multiplication." },
+          { q: "Open-loop vs closed-loop?", a: "Open-loop: no feedback (toaster runs N minutes regardless). Closed-loop: measures output, feeds back to adjust input (thermostat, PID controller). PID: Proportional (current error) + Integral (accumulated past error, fixes steady-state) + Derivative (rate of change, dampens oscillation). Used in ArduPilot for ROV/drone stability." }
+        ]
+      }
+    ];
+
+    // Initialize Mermaid
+    mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+
+    const state = {
+      activeSection: 'dashboard',
+      streakDates: JSON.parse(localStorage.getItem('ish_streak_dates') || '[]'),
+      notes: localStorage.getItem('ish_notes') || '',
+      checkedItems: {} // loaded dynamically
+    };
+
+    const getTodayISO = () => new Date().toISOString().split('T')[0];
+
+    // Helper functions
+    function calculateStreak() {
+      if (state.streakDates.length === 0) return 0;
+      let sorted = [...state.streakDates].sort().reverse();
+      let streak = 0;
+      let current = new Date(getTodayISO());
+      
+      // If last marked date is neither today nor yesterday, streak is broken
+      const lastMarked = new Date(sorted[0]);
+      const diffDays = Math.floor((current - lastMarked) / (1000 * 60 * 60 * 24));
+      
+      if (diffDays > 1) return 0;
+
+      for (let dateStr of sorted) {
+        const d = new Date(dateStr);
+        const diff = Math.floor((current - d) / (1000 * 60 * 60 * 24));
+        if (diff === 0 || diff === 1) {
+          streak++;
+          current = d; // move current back
+        } else {
+          break;
+        }
+      }
+      return streak;
+    }
+
+    function renderCalendarDots() {
+      const container = document.getElementById('calendar-dots');
+      container.innerHTML = '';
+      const today = new Date(getTodayISO());
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        const dStr = d.toISOString().split('T')[0];
+        
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+        if (state.streakDates.includes(dStr)) dot.classList.add('active');
+        container.appendChild(dot);
+      }
+    }
+
+    function updateStreakUI() {
+      document.getElementById('streak-count').innerText = calculateStreak();
+      renderCalendarDots();
+      
+      const btn = document.getElementById('btn-mark-today');
+      if (state.streakDates.includes(getTodayISO())) {
+        btn.innerText = 'Studied Today ✓';
+        btn.style.background = 'var(--success)';
+        btn.style.borderColor = 'var(--success)';
+        btn.disabled = true;
+      }
+    }
+
+    document.getElementById('btn-mark-today').addEventListener('click', () => {
+      const today = getTodayISO();
+      if (!state.streakDates.includes(today)) {
+        state.streakDates.push(today);
+        localStorage.setItem('ish_streak_dates', JSON.stringify(state.streakDates));
+        updateStreakUI();
+      }
+    });
+
+    // Notes
+    const notesTextarea = document.getElementById('notes-textarea');
+    const notesStatus = document.getElementById('notes-status');
+    notesTextarea.value = state.notes;
+
+    let noteTimeout;
+    notesTextarea.addEventListener('input', (e) => {
+      notesStatus.innerText = 'Saving...';
+      clearTimeout(noteTimeout);
+      noteTimeout = setTimeout(() => {
+        localStorage.setItem('ish_notes', e.target.value);
+        notesStatus.innerText = `Saved at ${new Date().toLocaleTimeString()}`;
+      }, 500);
+    });
+
+    document.getElementById('fab-notes').addEventListener('click', () => {
+      document.getElementById('notes-panel').classList.toggle('open');
+    });
+
+    document.getElementById('btn-clear-notes').addEventListener('click', () => {
+      if (confirm('Clear all notes?')) {
+        notesTextarea.value = '';
+        localStorage.setItem('ish_notes', '');
+        notesStatus.innerText = 'Cleared';
+      }
+    });
+
+    // Render DOM
+    function renderApp() {
+      document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+      
+      const navContainer = document.getElementById('nav-links');
+      const contentContainer = document.getElementById('content-area');
+
+      let totalItems = 0;
+      let totalChecked = 0;
+
+      data.forEach(sec => {
+        // Nav Link
+        const link = document.createElement('a');
+        link.className = `nav-link ${sec.id === state.activeSection ? 'active' : ''}`;
+        link.innerHTML = `<span>${sec.icon}</span> ${sec.title}`;
+        link.onclick = () => switchSection(sec.id);
+        navContainer.appendChild(link);
+
+        // Section Content
+        const sectionEl = document.createElement('div');
+        sectionEl.className = `section ${sec.id === state.activeSection ? 'active' : ''}`;
+        sectionEl.id = `section-${sec.id}`;
+
+        if (sec.isDashboard) {
+          sectionEl.innerHTML = `
+            <div class="section-header">
+              <h1 class="section-title">Welcome back, Vanshika.</h1>
+              <p style="color: var(--text-muted)">Ready to crush this interview?</p>
+            </div>
+            <div class="stats-grid" id="dashboard-stats"></div>
+          `;
+          contentContainer.appendChild(sectionEl);
+          return;
+        }
+
+        let sectionItems = sec.items ? sec.items.length : 0;
+        let sectionChecked = 0;
+
+        let html = `
+          <div class="section-header">
+            <h1 class="section-title">${sec.icon} ${sec.title}</h1>
+          </div>
+        `;
+
+        if (sec.items && sec.items.length > 0) {
+          html += `
+            <div class="progress-container">
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-fill-${sec.id}"></div>
+              </div>
+              <div class="progress-text" id="progress-text-${sec.id}">0%</div>
+            </div>
+          `;
+        }
+
+        if (sec.tips) {
+          sec.tips.forEach(tip => {
+            html += `
+              <div class="tip-card">
+                <div class="tip-icon">⚡</div>
+                <div class="tip-content">${tip}</div>
+              </div>
+            `;
+          });
+        }
+
+        if (sec.items) {
+          sec.items.forEach((item, idx) => {
+            totalItems++;
+            const isChecked = localStorage.getItem(`ish_checked_${sec.id}_${idx}`) === 'true';
+            if (isChecked) { sectionChecked++; totalChecked++; }
+
+            let bodyHtml = `<div class="answer">${marked.parse(item.a)}</div>`;
+            
+            if (item.diagram) {
+              bodyHtml += `<div class="mermaid-wrapper"><div class="mermaid">${item.diagram}</div></div>`;
+            }
+
+            if (item.followUps) {
+              item.followUps.forEach(f => {
+                bodyHtml += `
+                  <div class="follow-up">
+                    <div class="follow-up-q">${f.q}</div>
+                    <div class="follow-up-a">${marked.parse(f.a)}</div>
+                  </div>
+                `;
+              });
+            }
+
+            html += `
+              <div class="qna-card">
+                <div class="qna-header" onclick="toggleCard(this)">
+                  <div class="q-text">${item.q}</div>
+                  <div class="qna-actions">
+                    <input type="checkbox" class="reviewed-cb" ${isChecked ? 'checked' : ''} 
+                           onclick="event.stopPropagation(); toggleCheck('${sec.id}', ${idx}, this)">
+                    <span class="chevron">▼</span>
+                  </div>
+                </div>
+                <div class="qna-body">${bodyHtml}</div>
+              </div>
+            `;
+          });
+        }
+
+        sectionEl.innerHTML = html;
+        contentContainer.appendChild(sectionEl);
+
+        // Update initial progress
+        if (sectionItems > 0) {
+          setTimeout(() => {
+            const pct = Math.round((sectionChecked / sectionItems) * 100);
+            document.getElementById(`progress-fill-${sec.id}`).style.width = pct + '%';
+            document.getElementById(`progress-text-${sec.id}`).innerText = pct + '%';
+          }, 100);
+        }
+      });
+
+      // Dashboard stats
+      const focusTopics = data.filter(d => !d.isDashboard).map(d => d.title);
+      const todayFocus = focusTopics[new Date().getDate() % focusTopics.length];
+      
+      document.getElementById('dashboard-stats').innerHTML = `
+        <div class="stat-card">
+          <div class="stat-value">${Math.round((totalChecked / (totalItems || 1)) * 100)}%</div>
+          <div class="stat-label">Overall Progress</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${totalChecked} / ${totalItems}</div>
+          <div class="stat-label">Questions Reviewed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" style="font-size:24px; margin-top: 10px">${todayFocus}</div>
+          <div class="stat-label">Today's Focus</div>
+        </div>
+      `;
+
+      // Render diagrams
+      mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+    }
+
+    window.switchSection = function(id) {
+      state.activeSection = id;
+      
+      // Update nav links
+      document.querySelectorAll('.nav-link').forEach(el => {
+        el.classList.remove('active');
+      });
+      event.currentTarget.classList.add('active');
+
+      // Update sections
+      document.querySelectorAll('.section').forEach(el => {
+        el.classList.remove('active');
+      });
+      document.getElementById(`section-${id}`).classList.add('active');
+
+      document.querySelector('.content').scrollTop = 0;
+    };
+
+    window.toggleCard = function(headerEl) {
+      const card = headerEl.closest('.qna-card');
+      card.classList.toggle('expanded');
+    };
+
+    window.toggleCheck = function(secId, idx, cb) {
+      localStorage.setItem(`ish_checked_${secId}_${idx}`, cb.checked);
+      
+      // Recalculate section progress
+      const secData = data.find(d => d.id === secId);
+      let checkedCount = 0;
+      secData.items.forEach((_, i) => {
+        if (localStorage.getItem(`ish_checked_${secId}_${i}`) === 'true') checkedCount++;
+      });
+      
+      const pct = Math.round((checkedCount / secData.items.length) * 100);
+      document.getElementById(`progress-fill-${secId}`).style.width = pct + '%';
+      document.getElementById(`progress-text-${secId}`).innerText = pct + '%';
+
+      // Re-render dashboard stats silently
+      let totalChecked = 0;
+      let totalItems = 0;
+      data.forEach(d => {
+        if (d.items) {
+          totalItems += d.items.length;
+          d.items.forEach((_, i) => {
+            if (localStorage.getItem(`ish_checked_${d.id}_${i}`) === 'true') totalChecked++;
+          });
+        }
+      });
+      const statValueEls = document.querySelectorAll('.stat-value');
+      if (statValueEls.length > 0) {
+        statValueEls[0].innerText = Math.round((totalChecked / (totalItems || 1)) * 100) + '%';
+        statValueEls[1].innerText = `${totalChecked} / ${totalItems}`;
+      }
+    };
+
+    // Init
+    updateStreakUI();
+    renderApp();
+  </script>
+</body>
+</html>
