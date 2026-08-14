@@ -1,6 +1,6 @@
 # 🎯 AI & Tech Interview — Complete Study Resource
 
-> Your one-stop, interview-style training resource covering AI Engineering, System Design, Coding, LLD, and Behavioral questions. Built for serious prep.
+> Personal, interview-style study material covering AI Engineering, System Design, Coding, LLD, and Behavioral questions. Built for focused prep—not generic feature bloat.
 
 ---
 
@@ -63,25 +63,16 @@ Comprehensive, interview-ready Q&A with diagrams, follow-up chains, scenario bre
 
 ---
 
-## 🛡️ Resume-Based Interview Prep (NEW)
+## 🛡️ Resume-Based Interview Prep
 
-> Layer-by-layer defense system. Every word on your resume, battle-tested.
+> Layer-by-layer defense material for the claims you choose to make on your resume. Keep it precise and only use implementation details and metrics you can personally verify.
 
-### Interview Flow Layers
+### Opening & Claim Map
 
-| Layer | File | What It Covers |
-|-------|------|----------------|
-| 1 | [Intro & Opening](resume-prep/01_intro_and_opening.md) | 60-sec pitch (3 versions), follow-up defense, EE→CS story, company research framework |
-| 2 | [Experience Defense](resume-prep/02_experience_defense.md) | Cordum OSS + Research Intern — 5 levels deep, oversold bridges |
-| 3 | [Skills Defense](resume-prep/03_skills_defense.md) | Every skill on resume — gotcha questions, proof points, red flags |
-
-### Project Deep Dives (Code-Analyzed)
-
-| Project | File | Key Defense Points |
-|---------|------|--------------------|
-| RAGOS | [Deep Dive](resume-prep/04_project_deepdives/project_1_ragos.md) | Architecture, Random Search vs Bayesian, Pareto frontier, plugin system |
-| LLM Cost Guard | [Deep Dive](resume-prep/04_project_deepdives/project_2_llm_cost_guard.md) | Redis Lua atomicity, TOCTOU, circuit breaker, 7100+ concurrent tests |
-| Focus Lock | [Deep Dive](resume-prep/04_project_deepdives/project_3_focus_lock.md) | Shannon entropy, YOLOv8, EventBus, FocusFSM, 93% CPU reduction |
+| File | What It Covers |
+|------|----------------|
+| [Intro & Opening](resume-prep/01_intro_and_opening.md) | 60-second pitches, follow-up defense, EE→CS story, and company research framework. |
+| [Resume Claim Map](resume-prep/projects/00_resume_claim_map.md) | Technical claim → concept → drill-down path, including questions to verify before an interview. |
 
 ### 🔥 Deep Interrogation System (Priority Study Material)
 
@@ -89,12 +80,20 @@ Comprehensive, interview-ready Q&A with diagrams, follow-up chains, scenario bre
 
 | File | Lines | What It Is |
 |------|-------|-----------|
-| [Resume Claim Map](resume-prep/projects/00_resume_claim_map.md) | 577 | Every technical claim → technology → concept → drill-down path |
 | [RAGOS Interrogation](resume-prep/projects/ragos_interrogation.md) | 302 | All 4 bullets deconstructed, architecture, tech defense, attack mode |
 | [LLM Cost Guard Interrogation](resume-prep/projects/llm_cost_guard_interrogation.md) | 235 | Redis Lua deep dive, TOCTOU, concurrency testing, provider abstraction |
-| [Focus Lock Interrogation](resume-prep/projects/focus_lock_interrogation.md) | 812 | Shannon entropy math, YOLOv8 internals, threading/GIL, metric defense |
+| [Focus Lock Interrogation](resume-prep/projects/focus_lock_interrogation.md) | 379 | Shannon entropy math, YOLOv8 internals, threading/GIL, metric defense |
 | [Experience Interrogation](resume-prep/projects/experience_interrogation.md) | 227 | Cordum OSS + Research — ownership, attack mode, bridges |
 | [Technology Defense](resume-prep/projects/technology_defense.md) | 601 | ALL 18+ resume technologies at 7 levels (Basic→Scaling) |
+
+### 🎯 Start Here — Interview Tree & Priority Sheet
+
+Use these after the final introduction. They turn its technical claims into a finite, defensible preparation plan instead of an endless list of subjects.
+
+| File | What It Is |
+|------|------------|
+| [Interview Follow-up Tree](resume-prep/projects/intro_interview_tree.md) | Project-specific L1–L5 interviewer follow-ups for every claim in the introduction, including strong-answer criteria, expected depth, pitfalls, and likely next questions. |
+| [AI/Backend Priority Sheet](resume-prep/projects/priority_sheet.md) | The 30 highest-value questions, ranked by probability × depth × risk, with a six-day study sequence. |
 
 ### CSE Fundamentals
 
@@ -119,7 +118,7 @@ Comprehensive, interview-ready Q&A with diagrams, follow-up chains, scenario bre
 ## 🗺️ How to Use This Resource
 
 ### For Resume Defense (Priority #1)
-Start with Layer 1 → 2 → 3 → Project Deep Dives → CSE Fundamentals → DevOps → HR.
+Start with [Intro & Opening](resume-prep/01_intro_and_opening.md) → [Interview Follow-up Tree](resume-prep/projects/intro_interview_tree.md) → [AI/Backend Priority Sheet](resume-prep/projects/priority_sheet.md). Use the project interrogations only for the topics you need to deepen.
 
 ### For AI Engineering Roles
 Start with files 1-6 (core concepts), then 7-8 (system design + production), then 9-14 (specialized topics).

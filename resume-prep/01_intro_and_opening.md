@@ -2,36 +2,36 @@
 
 ---
 
-## ⚠️ Improved Pitches (v2 — Brutally Honest Rewrite)
+## ✅ Final Pitches (v3 — Red-Teamed)
+
+> ⚠️ Confirm Locust config before using any specific number: check `locustfile.py` for `user_count`, `spawn_rate`, `test duration`, and total requests completed. If you can't recite those exactly, use "high concurrency" instead of "7,100."
 
 ### For Technical Interviews (Engineer-Facing) — 60 sec
-> "Hi, I'm Vanshika, third-year EE at NIT Jamshedpur. My actual work for the past two years has been in backend systems and applied AI — specifically building the infrastructure layer around LLMs.
+> "Hi, I'm Vanshika, third-year EE at NIT Jamshedpur. For the past two years I've been building backend projects in the AI infrastructure space, mostly in Python.
 >
-> My strongest project is LLM Cost Guard — an AI gateway that handles token budget enforcement across multiple providers. The core problem was preventing double-charging under concurrent requests. I solved it using an atomic Redis Lua script and validated it with 7,100 concurrent integration tests — zero budget violations.
+> My strongest project is LLM Cost Guard — an LLM proxy that enforces token budgets across multiple providers. The core technical problem was concurrent budget over-authorization: two requests reading the same budget simultaneously, both passing the check, together exceeding the limit. I fixed it with an atomic Redis Lua script — the check and decrement happen in a single atomic operation in Redis. I validated it with a Locust load test at high concurrency — zero budget overruns across the full run.
 >
-> I've also built RAGOS, which is essentially AutoML for RAG pipelines — it runs constraint-aware search over 100+ configurations and returns Pareto-optimal results under latency and cost constraints.
+> I've also built RAGOS — it automates configuration search for RAG pipelines. You define latency and cost constraints, it runs Random Search over 100+ parameter combinations, and returns a Pareto frontier. The constraint filtering before each trial is the interesting part — no wasted API calls on configurations that can't satisfy the budget.
 >
-> And Focus Lock, a computer vision system using YOLOv8 and Shannon entropy-based adaptive sampling that cut CPU usage by 93%.
+> And Focus Lock — local computer vision using YOLOv8 and MediaPipe. I used Shannon entropy on frame differences to decide when to skip YOLO inference. During stationary desk sessions, this cut YOLO compute by roughly 93%.
 >
-> I'm drawn to this role because the problems here feel like the same class — distributed systems, performance under constraints, reliability."
-
-**What to steer toward:** Redis internals, Pareto frontier, Shannon entropy, concurrent testing. All fully defensible.
+> I'm applying because the problems — concurrent resource management, optimization under constraints, system reliability — map directly to what I've been building."
 
 ### For HR/Recruiter — 45 sec
-> "Hi, I'm Vanshika, third-year EE at NIT Jamshedpur. I've spent two years building backend systems for AI infrastructure — the plumbing that makes LLMs work reliably and cheaply.
+> "Hi, I'm Vanshika, third-year EE at NIT Jamshedpur. I've spent two years building backend projects around AI — primarily the systems that control cost, reliability, and performance when using LLMs.
 >
-> I built LLM Cost Guard, an AI gateway that survived 7,100 concurrent requests without a single budget error. I also built RAGOS which automatically finds the best RAG configuration under latency and cost constraints, and Focus Lock — a fully on-device attention tracker using computer vision.
+> My main project is LLM Cost Guard — an LLM proxy with token budget enforcement. I validated it under high concurrent load and got zero budget errors. I also built RAGOS, which automatically searches for optimal RAG pipeline configurations under latency and cost constraints, and Focus Lock — an on-device attention tracker that runs entirely locally using computer vision.
 >
-> I also contributed to Cordum, an open-source LLM framework, where I redesigned their policy enforcement pipeline.
+> I also contributed a merged PR to Cordum, an open-source LLM framework, where I redesigned their policy enforcement pipeline from synchronous to async.
 >
-> I'm interested in [Company] specifically because [specific reason]."
+> I'm interested in [Company] because [specific reason]."
 
 ### For Startup (Generalist) — 45 sec
-> "Hi, I'm Vanshika, third-year EE at NIT Jamshedpur. I build the infrastructure around AI systems — things like token budget enforcement, RAG optimization, and edge inference.
+> "Hi, I'm Vanshika, third-year EE at NIT Jamshedpur. I build backend systems around AI — token budget enforcement, RAG optimization, edge inference.
 >
-> My most technically interesting work is LLM Cost Guard — I used an atomic Redis Lua script to solve a race condition in token reservation under high concurrency, validated with 7,100 concurrent tests. I also built a focus tracker with 97.2% recall running entirely on-device with <30ms inference.
+> The technically interesting one is LLM Cost Guard — I used an atomic Redis Lua script to close a TOCTOU race condition in token reservation under concurrent load. I also built a focus tracker with 97.2% recall running fully on-device.
 >
-> I want to work somewhere I can own things end-to-end and ship fast."
+> I want to work somewhere I own things end-to-end."
 
 ---
 

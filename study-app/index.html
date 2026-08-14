@@ -899,12 +899,18 @@
       checkedItems: {} // loaded dynamically
     };
 
-    const getTodayISO = () => new Date().toISOString().split('T')[0];
+    // Use the local calendar date. `toISOString()` uses UTC and can otherwise
+    // assign a late-night study session to the wrong day.
+    const getTodayISO = () => {
+      const now = new Date();
+      const local = new Date(now.getTime() - now.getTimezoneOffset() * 60_000);
+      return local.toISOString().split('T')[0];
+    };
 
     // Helper functions
     function calculateStreak() {
       if (state.streakDates.length === 0) return 0;
-      let sorted = [...state.streakDates].sort().reverse();
+      let sorted = [...new Set(state.streakDates)].sort().reverse();
       let streak = 0;
       let current = new Date(getTodayISO());
       
@@ -934,7 +940,8 @@
       for (let i = 29; i >= 0; i--) {
         const d = new Date(today);
         d.setDate(d.getDate() - i);
-        const dStr = d.toISOString().split('T')[0];
+        const local = new Date(d.getTime() - d.getTimezoneOffset() * 60_000);
+        const dStr = local.toISOString().split('T')[0];
         
         const dot = document.createElement('div');
         dot.className = 'dot';
