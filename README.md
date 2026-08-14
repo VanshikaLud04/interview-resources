@@ -2,6 +2,10 @@
 
 > Personal, interview-style study material covering AI Engineering, System Design, Coding, LLD, and Behavioral questions. Built for focused prep—not generic feature bloat.
 
+## 📱 Study Hub App
+
+Open the [installable Interview Hub](https://vanshikalud04.github.io/interview-resources/) on a phone or desktop browser. After the first online load, it can run from your home screen/app launcher and keeps its study shell available offline.
+
 ---
 
 ## 📁 AI Engineering Interview Notes
