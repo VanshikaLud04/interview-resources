@@ -1,0 +1,19 @@
+{
+  "name": "Vanshika's Interview Hub",
+  "short_name": "Interview Hub",
+  "description": "A focused, offline-friendly interview preparation hub.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#11101a",
+  "theme_color": "#181322",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
