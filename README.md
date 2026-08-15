@@ -79,6 +79,7 @@ Comprehensive, interview-ready Q&A with diagrams, follow-up chains, scenario bre
 | File | What It Covers |
 |------|----------------|
 | [Intro & Opening](resume-prep/01_intro_and_opening.md) | 60-second pitches, follow-up defense, EE→CS story, and company research framework. |
+| [Answer Any New Question](resume-prep/11_answer_any_new_question.md) | Practical frameworks for unfamiliar technical, debugging, system-design, project, and behavioral questions—without bluffing or rambling. |
 | [Resume Claim Map](resume-prep/projects/00_resume_claim_map.md) | Technical claim → concept → drill-down path, including questions to verify before an interview. |
 
 ### 🔥 Deep Interrogation System (Priority Study Material)
