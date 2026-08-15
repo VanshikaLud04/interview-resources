@@ -294,6 +294,28 @@ Response: Returns HTTP 202 Accepted with `{"experiment_id": 123, "status": "runn
 
 ## SECTION 11: WHAT WOULD YOU CHANGE?
 
+## Resume Defense — Technology Choices, Friction, and Next Week
+
+### Q. Why FastAPI, PostgreSQL, ChromaDB, LiteLLM, Docker, and asyncio?
+
+**Answer:** “FastAPI gave me typed API boundaries and an async-friendly service layer. PostgreSQL is where I would keep experiment metadata and results because the data is relational and queryable. ChromaDB made the retrieval layer easy to prototype without building an index from scratch. LiteLLM kept provider calls and cost accounting behind one interface. Docker Compose made the stack reproducible locally. Finally, asyncio fit the experiment runner because many trials wait on model and network I/O rather than burn CPU.”
+
+### Q. What was the hardest practical issue in RAGOS?
+
+**Answer:** “The difficult part was avoiding expensive, meaningless trials. A naïve search can combine settings that violate a user’s cost or latency constraint, then discover that only after paying for calls. I handled that by treating constraints as a first-class stage before execution. The remaining limitation is that estimates are only as good as the assumptions behind them, so I keep the answer focused on reducing obviously invalid work—not claiming perfect prediction.”
+
+### Q. Why Random Search rather than Bayesian Optimization?
+
+**Answer:** “I wanted an honest baseline that works well for mixed categorical choices—retriever strategy, model, reranker—and can run trials independently in parallel. Bayesian Optimization would be a sensible next upgrade once I have enough reliable observations, but it adds surrogate-model complexity and is less convenient when several parameters are categorical.”
+
+### Q. If you had one week, what would you improve?
+
+**Answer:** “First, I would make runs reproducible: persist every sampled configuration, seed, dataset version, prompt version, raw latency, and cost. Second, I would persist the semantic cache instead of the current in-memory showcase cache. Third, I would add repeated trials and confidence intervals so the Pareto frontier is not driven by one noisy evaluation. That gives the project more trustworthy decisions before adding more search algorithms.”
+
+### Q. What would break first at 100x scale?
+
+**Answer:** “The local in-memory cache and single-process orchestration. I would move experiment dispatch to durable workers, rate-limit provider calls, make results idempotent, and persist cache/experiment state. The key distinction is that Random Search itself parallelizes easily; reliable distributed execution and evaluation cost control are the hard parts.”
+
 ## Q. If you had 3 more months to work on this, what would you rebuild?
 **Answer:** 
 1. **Bayesian Optimization / Optuna:** I would integrate Optuna to use Tree-structured Parzen Estimator (TPE) instead of naive random search to converge faster.

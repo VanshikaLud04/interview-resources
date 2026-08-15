@@ -333,6 +333,28 @@ Additionally, I would replace Python threads with Python `multiprocessing` combi
 
 ## SECTION 11: ADDITIONAL ATTACK VECTORS & EDGE CASES
 
+## Resume Defense — Technology Choices, Friction, and Next Week
+
+### Q. Why YOLOv8n, MediaPipe, OpenCV, SQLite, and WebSockets together?
+
+**Answer:** “YOLOv8n keeps object detection lightweight enough for a local prototype, while MediaPipe supplies face landmarks and head-pose signals that a generic detector does not. OpenCV handles camera I/O and frame operations. SQLite fits a single-user local app with no server to operate. WebSockets let the dashboard receive state updates without polling. The architecture deliberately separates capture/inference from analytics so UI and storage work do not sit on the critical path.”
+
+### Q. What was the most interesting issue in the pipeline?
+
+**Answer:** “Running heavy CV work on every captured frame wastes compute during a static desk session. I used frame-difference entropy to adapt the inference interval: high motion produces more frequent checks, while static scenes back off. The trade-off is that a low-motion distraction can be missed temporarily, so a robust version needs periodic forced inference and evaluation of that edge case.”
+
+### Q. Why not run inference on every frame or use only one model?
+
+**Answer:** “Every-frame inference is simpler but needlessly expensive for a local background tool. A single model also loses complementary signals: YOLO detects objects, while MediaPipe contributes face/gaze geometry. I chose a small multi-signal pipeline and then made sampling adaptive; the cost is more state management and more evaluation work.”
+
+### Q. If you had one week, what would you improve?
+
+**Answer:** “I would make the metrics reproducible first: check in a labelled evaluation subset, record device and package versions, and run real inference profiling rather than a scaffold. Then I would add a bounded writer queue with a clear drop policy, forced periodic inference for static scenes, and a simple false-positive feedback loop in the dashboard. Those changes improve trust more than adding another model.”
+
+### Q. What would change for multiple users or cloud deployment?
+
+**Answer:** “I would keep raw video on-device by default, move only consented aggregate events to a backend, and replace the in-process EventBus with a durable message layer. SQLite would become a server-side store for aggregate data, while edge clients retain local inference. Privacy, consent, and device variability become product constraints—not an afterthought.”
+
 ## Q. What if the user places a printed photo of themselves in front of the camera?
 **Answer:** This is a classic presentation attack (spoofing). MediaPipe face mesh will likely detect the face in the 2D photo and return landmarks. However, the system can mitigate this by checking for micro-movements (like blinking or slight head jitter) over time. If the landmarks remain perfectly static (entropy is exactly zero for an extended period), the system can flag it as a spoofing attempt.
 
@@ -359,4 +381,3 @@ Additionally, I would replace Python threads with Python `multiprocessing` combi
 
 #### Follow-up: What if someone walks behind the user and holds up a phone?
 **Answer:** YOLO will detect the phone, but the `geometry.py` intersection logic checks if the phone bounding box overlaps with the *primary* user's bounding box and is within the primary user's gaze vector. Since the secondary person's phone is outside this zone, it is ignored.
-

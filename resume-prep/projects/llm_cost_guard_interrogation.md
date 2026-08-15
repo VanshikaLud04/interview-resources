@@ -231,5 +231,27 @@
 
 ## SECTION 10: WHAT WOULD YOU CHANGE?
 
+## Resume Defense — Technology Choices, Friction, and Next Week
+
+### Q. Why Redis plus PostgreSQL instead of only one database?
+
+**Answer:** “They serve different paths. Redis is the fast shared coordination layer for atomic reservation and cache-like state on every request. PostgreSQL is the durable relational record for usage, policies, and audit-friendly data. Using Postgres for every hot reservation would increase contention and latency; using Redis as the only source of truth would weaken durability.”
+
+### Q. Why Celery and RabbitMQ?
+
+**Answer:** “The response path should reserve budget, route the request, and return without waiting on non-critical persistence. Celery gives a familiar worker abstraction; RabbitMQ provides the broker; Redis is configured as the result backend. I use this as a separation-of-concerns argument, not as a claim that every background task needs a queue.”
+
+### Q. What issue did you face that is worth discussing?
+
+**Answer:** “The central issue is concurrent reservation: independent requests must not both observe the same remaining budget and both spend it. The fix is to put check-and-reserve logic in one atomic Redis Lua execution. A second real design issue is estimation: token use is not final until the provider responds, so the system needs a reserve-and-reconcile path rather than pretending the estimate is exact.”
+
+### Q. If you had one week, what would you improve?
+
+**Answer:** “I would add a visible reconciliation ledger: reservation ID, estimated tokens, final tokens, refund/extra-charge outcome, and failure reason. Then I would add idempotency tests around retries and provider timeouts. Finally, I would expose queue depth, reservation failures, cache hit rate, and provider latency as dashboard metrics. Those changes improve operational trust before chasing more providers.”
+
+### Q. What could go wrong in production?
+
+**Answer:** “Redis can be unavailable, a provider can fail after reservation, a worker can fall behind, or a retry can duplicate work. Each needs an explicit policy: fail open versus fail closed for Redis, compensating refund/reconcile for provider failure, monitoring plus retries for workers, and idempotency keys for duplicate requests. Naming the policy matters more than pretending the system has no failure modes.”
+
 ## Q. Looking back at this architecture, what is the biggest flaw or bottleneck, and how would you fix it for V2?
 **Answer:** The biggest flaw is that relying entirely on Redis for strict global token budgets becomes a bottleneck if we deploy across multiple geographic regions (e.g., US-East and EU-West). A strict atomic Lua script requires a single source of truth, meaning one region will suffer high cross-region latency. For V2, I would move to a relaxed coordination model (like a local budget token bucket that syncs with a global counter asynchronously), trading off strict atomicity for lower latency in multi-region deployments.
