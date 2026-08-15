@@ -38,6 +38,7 @@ Comprehensive, interview-ready Q&A with diagrams, follow-up chains, scenario bre
 | File | Description |
 |------|-------------|
 | [System Design Framework](system-design/frameworks.md) | How to approach ANY system design question — 4-step framework, building blocks, AI-specific considerations |
+| [Major App Walkthroughs](system-design/major_app_walkthroughs.md) | Diagram-led walkthroughs for URL shortener, feeds, chat, file sync, video, ride hailing, rate limiting, and RAG — with reasoning follow-ups |
 | [Questions by Company](system-design/questions_by_company.md) | 150+ system design questions organized by company with topic tags and approach hints |
 
 ---
@@ -47,6 +48,7 @@ Comprehensive, interview-ready Q&A with diagrams, follow-up chains, scenario bre
 | File | Description |
 |------|-------------|
 | [DSA Pattern Guide](coding/patterns.md) | 18 major patterns with templates, complexity, signal words, and Python code |
+| [Maths, Bits & Binary Search](coding/dsa_math_binary_companion.md) | C++-oriented binary-search boundaries, bit manipulation, number theory, modular arithmetic, combinatorics, geometry, and practice drills |
 | [Questions by Company](coding/questions_by_company.md) | 1,700+ coding questions from 160+ companies with DSA pattern tags |
 
 ---

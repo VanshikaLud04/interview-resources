@@ -657,6 +657,20 @@
         description: "Verified Focus Lock answers, from model choice to production improvements."
       },
       {
+        id: "dsa_math_binary",
+        title: "Maths + Binary",
+        icon: "🔢",
+        markdownPath: "coding/dsa_math_binary_companion.md",
+        description: "High-frequency maths, bit manipulation, and binary-search reasoning with C++ templates."
+      },
+      {
+        id: "system_design_apps",
+        title: "System Design Apps",
+        icon: "🏗️",
+        markdownPath: "system-design/major_app_walkthroughs.md",
+        description: "Walk through the major interview apps with diagrams, trade-offs, and reasoning follow-ups."
+      },
+      {
         id: "ragos",
         title: "RAGOS",
         icon: "🚀",
@@ -1195,10 +1209,22 @@
 
         target.innerHTML = marked.parse(markdown);
         target.classList.remove('loading');
+        target.querySelectorAll('code.language-mermaid').forEach((code, index) => {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'mermaid-wrapper';
+          const diagram = document.createElement('div');
+          diagram.className = 'mermaid';
+          diagram.id = `material-mermaid-${section.id}-${index}`;
+          diagram.textContent = code.textContent;
+          wrapper.appendChild(diagram);
+          code.closest('pre').replaceWith(wrapper);
+        });
         target.querySelectorAll('a').forEach(link => {
           link.target = '_blank';
           link.rel = 'noopener noreferrer';
         });
+        const diagrams = target.querySelectorAll('.mermaid');
+        if (diagrams.length) mermaid.init(undefined, diagrams);
       } catch {
         target.innerHTML = '<p>Could not load this material right now. Check your connection, then reopen the section.</p>';
         target.classList.remove('loading');
