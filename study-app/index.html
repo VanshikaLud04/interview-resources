@@ -269,6 +269,55 @@
     .tip-icon { font-size: 20px; }
     .tip-content { font-size: 14px; line-height: 1.6; color: #fef3c7; }
 
+    /* Long-form study material */
+    .material-card {
+      background: linear-gradient(120deg, rgba(255,255,255,0.075), rgba(255,255,255,0.035));
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 28px;
+      color: var(--text-muted);
+      line-height: 1.75;
+    }
+    .material-card.loading { color: var(--text-muted); }
+    .material-card h1, .material-card h2, .material-card h3 {
+      color: var(--text);
+      line-height: 1.25;
+      margin: 30px 0 12px;
+    }
+    .material-card h1 { font: 800 30px/1.2 'Playfair Display', serif; margin-top: 0; }
+    .material-card h2 { font-size: 22px; }
+    .material-card h3 { font-size: 17px; }
+    .material-card p, .material-card ul, .material-card ol { margin: 0 0 16px; }
+    .material-card ul, .material-card ol { padding-left: 24px; }
+    .material-card li + li { margin-top: 6px; }
+    .material-card strong { color: var(--text); }
+    .material-card a { color: var(--accent-secondary); }
+    .material-card code {
+      background: rgba(9, 7, 17, 0.6);
+      color: var(--accent-secondary);
+      padding: 2px 5px;
+      border-radius: 5px;
+      font-size: 0.9em;
+    }
+    .material-card pre {
+      background: rgba(9, 7, 17, 0.7);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      overflow-x: auto;
+      padding: 14px;
+      margin: 0 0 16px;
+    }
+    .material-card pre code { background: transparent; padding: 0; }
+    .material-card blockquote {
+      border-left: 3px solid var(--accent);
+      margin: 0 0 16px;
+      padding: 8px 0 8px 14px;
+      color: #ddd6fe;
+    }
+    .material-card table { border-collapse: collapse; display: block; overflow-x: auto; margin-bottom: 16px; }
+    .material-card th, .material-card td { border: 1px solid var(--card-border); padding: 8px 10px; text-align: left; }
+    .material-card th { color: var(--text); background: rgba(255,255,255,0.06); }
+
     /* Accordion */
     .qna-card {
       background: linear-gradient(120deg, rgba(255,255,255,0.075), rgba(255,255,255,0.035));
@@ -504,6 +553,9 @@
       .btn { padding: 8px 12px; font-size: 12px; }
       .content { padding: 30px 16px 90px; }
       .section-title { font-size: 33px; }
+      .material-card { padding: 20px 16px; border-radius: 14px; }
+      .material-card h1 { font-size: 26px; }
+      .material-card h2 { font-size: 20px; }
       .qna-header { padding: 16px; }
       .q-text { font-size: 15px; }
       .qna-actions { gap: 10px; }
@@ -570,6 +622,41 @@
         isDashboard: true
       },
       {
+        id: "priority_sheet",
+        title: "Priority 30",
+        icon: "🎯",
+        markdownPath: "resume-prep/projects/priority_sheet.md",
+        description: "The highest-yield questions to rehearse first."
+      },
+      {
+        id: "followup_tree",
+        title: "Follow-up Tree",
+        icon: "🌳",
+        markdownPath: "resume-prep/projects/intro_interview_tree.md",
+        description: "Use this after your introduction to anticipate the next drill-down."
+      },
+      {
+        id: "ragos_playbook",
+        title: "RAGOS Playbook",
+        icon: "🧭",
+        markdownPath: "resume-prep/projects/ragos_interrogation.md",
+        description: "Verified RAGOS answers: choices, issues, trade-offs, and next steps."
+      },
+      {
+        id: "cost_guard_playbook",
+        title: "Cost Guard Playbook",
+        icon: "🛡️",
+        markdownPath: "resume-prep/projects/llm_cost_guard_interrogation.md",
+        description: "Verified LLM Cost Guard answers, including the deeper follow-ups."
+      },
+      {
+        id: "focus_lock_playbook",
+        title: "Focus Lock Playbook",
+        icon: "🧠",
+        markdownPath: "resume-prep/projects/focus_lock_interrogation.md",
+        description: "Verified Focus Lock answers, from model choice to production improvements."
+      },
+      {
         id: "ragos",
         title: "RAGOS",
         icon: "🚀",
@@ -633,7 +720,7 @@
         icon: "💰",
         tips: [
           "The Redis Lua script question is the #1 differentiator. Know TOCTOU cold.",
-          "If they push on K8s/AWS depth: 'I containerized everything and wrote K8s manifests for local Minikube deployment to ensure cloud-native architecture. Production-scale K8s ops is something I'm actively learning.'"
+          "If they push on K8s/AWS depth: explain that Docker Compose is what you built for this stack. Present Kubernetes/AWS as concepts you can design for, not a deployment you claim to have shipped."
         ],
         items: [
           {
@@ -1087,6 +1174,37 @@
       });
     }
 
+    const MATERIAL_GITHUB_BASE = 'https://raw.githubusercontent.com/VanshikaLud04/interview-resources/main/';
+
+    async function loadStudyMaterial(section, target) {
+      const sources = [
+        `../${section.markdownPath}`,
+        `${MATERIAL_GITHUB_BASE}${section.markdownPath}`
+      ];
+
+      try {
+        let markdown = '';
+        for (const source of sources) {
+          const response = await fetch(source);
+          if (response.ok) {
+            markdown = await response.text();
+            break;
+          }
+        }
+        if (!markdown) throw new Error('Study material was unavailable.');
+
+        target.innerHTML = marked.parse(markdown);
+        target.classList.remove('loading');
+        target.querySelectorAll('a').forEach(link => {
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+        });
+      } catch {
+        target.innerHTML = '<p>Could not load this material right now. Check your connection, then reopen the section.</p>';
+        target.classList.remove('loading');
+      }
+    }
+
     // Render DOM
     function renderApp() {
       document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
@@ -1122,6 +1240,19 @@
             <div class="stats-grid" id="dashboard-stats"></div>
           `;
           contentContainer.appendChild(sectionEl);
+          return;
+        }
+
+        if (sec.markdownPath) {
+          sectionEl.innerHTML = `
+            <div class="section-header">
+              <h1 class="section-title">${sec.icon} ${sec.title}</h1>
+              <p style="color: var(--text-muted); max-width: 650px; line-height: 1.65;">${sec.description}</p>
+            </div>
+            <div class="material-card loading">Loading your study material…</div>
+          `;
+          contentContainer.appendChild(sectionEl);
+          loadStudyMaterial(sec, sectionEl.querySelector('.material-card'));
           return;
         }
 

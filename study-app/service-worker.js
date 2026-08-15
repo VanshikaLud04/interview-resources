@@ -1,7 +1,6 @@
-const CACHE_NAME = 'interview-hub-v1';
+const CACHE_NAME = 'interview-hub-v2';
 const APP_SHELL = [
   './',
-  './index.html',
   './manifest.webmanifest',
   './icons/icon.svg'
 ];

@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/study-app/index.html" },
+    { "source": "/manifest.webmanifest", "destination": "/study-app/manifest.webmanifest" },
+    { "source": "/service-worker.js", "destination": "/study-app/service-worker.js" },
+    { "source": "/icons/:path*", "destination": "/study-app/icons/:path*" }
+  ]
+}
