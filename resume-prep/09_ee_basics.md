@@ -18,6 +18,54 @@
 
 ---
 
+## Semiconductor Devices: BJT, MOSFET, IGBT
+
+### Q. How does an NPN BJT work?
+**A:** An NPN BJT has an n-type emitter, thin p-type base, and n-type collector. In forward-active operation, the base-emitter junction is forward biased and the base-collector junction is reverse biased. Electrons injected from the emitter cross the thin base; the collector electric field sweeps most of them into the collector. A small base current controls a much larger collector current (`I_C ≈ beta I_B` in the simple model).
+
+**Regions:**
+- **Cutoff:** base-emitter not forward biased; essentially off.
+- **Forward active:** amplification region; `I_C` is mainly controlled by base drive / `V_BE`.
+- **Saturation:** both junctions forward biased; switch is on but no longer in linear amplification.
+
+**Follow-up: Why is the base thin and lightly doped?** So few emitter electrons recombine in the base; most reach the collector, producing current gain.
+
+### Q. How does an NMOS MOSFET work?
+**A:** A MOSFET is voltage-controlled. When `V_GS` exceeds threshold voltage, the electric field through the insulated gate oxide creates an inversion channel between source and drain. Current can then flow from drain to source. Because the gate is insulated, ideal DC gate current is nearly zero.
+
+**Regions:**
+- **Cutoff:** `V_GS < V_TH`; channel absent.
+- **Triode/linear:** channel behaves roughly like a controllable resistor; common for an on-switch with low `R_DS(on)`.
+- **Saturation:** pinched near the drain; current depends mainly on `V_GS`; common in analogue amplification models.
+
+**Follow-up: Why is it good for switching?** Gate drive needs charge, not sustained DC current; a fully enhanced device can have low on-resistance and switch efficiently at high frequency.
+
+### Q. How does an IGBT work?
+**A:** An IGBT combines a MOS gate input with bipolar conduction in the power path. A positive gate voltage forms a MOS channel that enables carrier injection through the device, giving low conduction loss at high voltage/current. It is normally used as a power switch, not a small-signal amplifier.
+
+**Key trade-off:** IGBTs are attractive in high-voltage/high-current applications (motor drives, inverters, EV power electronics) but are generally slower to turn off than MOSFETs because stored minority carriers create a tail current.
+
+### Q. BJT vs MOSFET vs IGBT?
+
+| Device | Control | Best mental model | Typical strength | Main limitation |
+|---|---|---|---|---|
+| BJT | current-driven base (with exponential `V_BE` relation) | current amplifier / switch | gain, analogue circuits | continuous base-drive current, slower power switching |
+| MOSFET | voltage-driven insulated gate | field-effect switch | fast switching, low gate DC power | conduction loss rises with `R_DS(on)` at high voltage |
+| IGBT | voltage-driven MOS gate + bipolar power path | high-power switch | high voltage/current, low conduction loss | slower turn-off / tail current |
+
+### Q. How would you choose a MOSFET or IGBT for a converter?
+**A:** Start with bus voltage, current, switching frequency, thermal budget, and cost. For lower-to-medium voltage and high switching frequency, a MOSFET is often preferred because it switches quickly. At higher voltage/current where conduction loss dominates and switching frequency is lower, an IGBT can be a better fit. I would compare datasheet switching energy, on-state loss, gate-drive requirements, cooling, and safe-operating-area—not choose only by device label.
+
+### Q. What is a flyback diode and why is it needed with an inductive load?
+**A:** Inductor current cannot stop instantly. When a relay/motor switch turns off, the inductor can create a large voltage spike to preserve current. A properly oriented flyback diode gives that current a safe path and protects the switch. In higher-performance power stages, diode recovery and switching losses also matter.
+
+### Q. What is thermal runaway?
+**A:** A temperature rise can increase device losses or current, creating more heat and a feedback loop. Prevent it with correct derating, heat sinking, current limiting, thermal design, and device selection. The exact risk and mitigation differ by device and circuit.
+
+**EE-to-software bridge:** These device questions are usually testing first-principles reasoning: identify control input, state/operating region, loss/failure mode, and the trade-off. Use the same structure in software answers.
+
+---
+
 ## Digital Electronics
 
 ### Q. Combinational vs Sequential circuits?
