@@ -9,7 +9,7 @@
 **A:** "I've spent the last year on backend systems and AI infrastructure—LLM Cost Guard handles 7,000+ concurrent requests. I know [Company] is solving [their scaling challenge]. I want to bring my async systems and distributed architecture experience to a team where I build products impacting thousands of users."
 
 ## Q. "Strengths?"
-**A:** 1) **System-level thinking** — EE + backend means I think about CPU, memory, DB locks. In Focus Lock I optimized YOLOv8 with Shannon entropy, keeping inference under 30ms. 2) **Diving into large codebases** — proved by contributing an async policy sidecar to Cordum's open-source repo.
+**A:** 1) **System-level thinking** — EE + backend means I think about CPU, memory, DB locks. In Focus Lock I designed entropy-based adaptive sampling to reduce how often heavy inference runs. 2) **Diving into large codebases** — I submitted a LangChain policy-governance callback to Cordum and learned to work within an established integration layer.
 
 ## Q. "Weakness?"
 **A:** "Over-engineering. During early hackathons I'd try full microservices + Kafka for a simple MVP. Now I build robust monolith first, only add complexity like RabbitMQ when traffic demands it."
@@ -41,10 +41,10 @@
 **A:** "Complementary. EE gave me math, signal processing, low-level system constraints. When I write backend Python/C++, I understand what the hardware is doing. EE makes me a more hardware-aware software engineer."
 
 ### Q. "CGPA is 7.57?"
-**A:** "Deliberate choice to optimize for real-world engineering over grades. While maintaining a respectable CGPA in a rigorous EE program, I dedicated 30+ hours/week to building systems, contributing to open source, and competing nationally. My 26/26 passing integration tests at Cordum speak to coding capabilities better than a textbook exam."
+**A:** "I balanced a rigorous EE curriculum with project work, research, open-source contribution, and competitions. The useful signal is the work I can walk through clearly—design choices, code, and evidence—not an inflated claim about a PR that was not merged."
 
 ### Q. "No corporate internship?"
-**A:** "I pursued roles with maximum architectural impact. Open-source Cordum—real PR reviews, CI/CD. Research internship across NIT Jamshedpur and IIT Guwahati—building simulation pipelines. Deeper, more hands-on than a typical summer internship."
+**A:** "I pursued hands-on work: a public open-source contribution with a real design iteration, plus a research internship across NIT Jamshedpur and IIT Guwahati building simulation pipelines. I can explain exactly what I owned and what I learned from each."
 
 ---
 

@@ -469,31 +469,15 @@ Focus Lock
 ## Experience 1: Cordum (Open Source)
 
 ```
-Bullet: "Redesigned policy enforcement by replacing synchronous HTTP checks with an async job pipeline"
- ├── What was the original architecture? (sync HTTP call to policy service during LLM execution)
- ├── What was the problem? (blocking: LLM execution waits for policy check response)
- ├── What is an async job pipeline? (fire-and-forget → evaluate async → approve/deny)
- ├── How does async approval work? (queue job → worker evaluates → callback/webhook)
- ├── What happens while the job is pending? (execution waits? proceeds optimistically?)
- ├── What is the latency improvement?
- └── What is the consistency tradeoff? (async = eventual, what if policy denies after execution starts?)
-
-Bullet: "Developed cordum-langchain-guard, a Python sidecar service"
- ├── What is a sidecar pattern?
- ├── Why sidecar vs library vs middleware?
- ├── What does cordum-langchain-guard do?
- ├── How does it communicate with the main service? (HTTP? gRPC? queue?)
- ├── How is it deployed alongside the main service?
- └── Why Python for the sidecar? Could it be Go?
-
-Bullet: "Implemented deterministic 403 policy-denial handling and real-time execution routing, contributing to a merged PR with 26/26 passing integration tests."
- ├── What is "deterministic 403"? (guaranteed denial for policy violations, no ambiguity)
- ├── What is "real-time execution routing"? (routing LLM calls based on live policy state)
- ├── What were the 26 integration tests testing?
- ├── How was the PR review process?
- ├── What feedback did maintainers give?
- ├── How long from first commit to merge?
- └── What did you learn from the codebase?
+Verified public contribution: PR #263 (closed, not merged)
+ ├── What did you add? (`govern()` + `CordumGovernanceCallback`, 142 lines across two files)
+ ├── How does it attach to LangChain? (`Runnable.with_config()` with a legacy callback fallback)
+ ├── What endpoint does it call? (`/api/v1/policy/evaluate` via httpx)
+ ├── Which metadata is sent? (topic, tenant, capability, risk tags)
+ ├── What happens on DENY / REQUIRE_HUMAN? (`PermissionError` before tool execution)
+ ├── Is it a sidecar or async job pipeline? (No; it is a callback-based policy adapter)
+ ├── Was it merged? (No; the later merged #264 credited #263 as design inspiration)
+ └── What did you learn? (framework compatibility and accurate scope/ownership)
 ```
 
 ## Experience 2: Research Intern

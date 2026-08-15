@@ -22,7 +22,7 @@
 >
 > My main project is LLM Cost Guard — an LLM proxy with token budget enforcement. I validated it under high concurrent load and got zero budget errors. I also built RAGOS, which automatically searches for optimal RAG pipeline configurations under latency and cost constraints, and Focus Lock — an on-device attention tracker that runs entirely locally using computer vision.
 >
-> I also contributed a merged PR to Cordum, an open-source LLM framework, where I redesigned their policy enforcement pipeline from synchronous to async.
+> I also submitted a public Cordum contribution: a LangChain policy-governance callback that performs a pre-tool HTTP policy check. That PR was closed, and I describe it accurately rather than claiming ownership of the later merged redesign.
 >
 > I'm interested in [Company] because [specific reason]."
 
@@ -55,7 +55,7 @@
 **A:** "I don't see them as separate. EE gave me first-principles thinking about constraints and optimization — the same mathematical thinking I apply to backend systems. In Focus Lock I used Shannon entropy for adaptive CPU optimization, which is the exact same math from my signals courses. The transition wasn't a pivot, it was an extension."
 
 ## Q. "Walk me through your resume."
-**A:** "Three buckets. First: **AI Infrastructure** — LLM Cost Guard handles concurrent token budgets with atomic Redis scripts; RAGOS automates RAG optimization under constraints. Second: **Open Source** — contributed an async policy pipeline to Cordum. Third: **Applied Research** — 10-month internship building CV simulation pipelines for underwater robots at NIT Jamshedpur and IIT Guwahati."
+**A:** "Three buckets. First: **AI Infrastructure** — LLM Cost Guard handles concurrent token budgets with atomic Redis scripts; RAGOS automates RAG optimization under constraints. Second: **Open Source** — submitted a LangChain policy-governance callback to Cordum and learned from the review/design iteration. Third: **Applied Research** — 10-month internship building CV simulation pipelines for underwater robots at NIT Jamshedpur and IIT Guwahati."
 
 ## Q. "What are you passionate about?"
 **A:** "Concurrency and performance. I love finding where systems break under load and fixing the root cause rather than patching around it. The Redis Lua script in LLM Cost Guard was that kind of problem — the naive solution (read-check-write) has a TOCTOU race condition that only shows up under high concurrency."
@@ -76,7 +76,7 @@
 **A:** "Most people who work with LLMs treat them as a black box API. I've built the infrastructure around them — the rate limiting, the routing, the cost tracking, the optimization layer. I think about LLMs as a systems engineering problem."
 
 ## Q. "Defend your CGPA (7.57)."
-**A:** "Deliberate tradeoff. I was running 30+ hours/week of engineering work while maintaining a respectable CGPA in a rigorous EE curriculum. My 26/26 integration tests passing at Cordum, 7,100 concurrent tests in LLM Cost Guard — that's the engineering quality signal that matters for this role."
+**A:** "I balanced a rigorous EE curriculum with sustained project work, research, and open-source contribution. I focus on concrete engineering evidence I can show—my project code, load-test artifacts, and the specific public Cordum PR—rather than asking you to infer ability from a single number."
 
 ## Q. "No corporate internship?"
 **A:** "I chose for depth over brand name. A 10-month research internship across two institutions where I built 20+ simulation pipelines from scratch, plus open-source contribution with a real PR review cycle — I got more architectural ownership than a typical summer internship."

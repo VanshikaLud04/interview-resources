@@ -754,19 +754,19 @@
         items: [
           {
             q: "Tell me about your Cordum open source contribution.",
-            a: "I contributed a merged PR that redesigned the LLM policy enforcement pipeline. The original was synchronous—every LLM execution blocked on an HTTP round-trip to the policy service. I replaced it with an async job pipeline: the sidecar (cordum-langchain-guard) queues policy evaluation as a job, and the execution path is no longer blocked. The PR includes deterministic 403 handling for policy violations and passed all 26/26 integration tests.",
+            a: "I submitted Cordum PR #263, a callback-based LangChain policy-governance adapter. It adds a `govern()` helper and callback that calls `/api/v1/policy/evaluate` with `httpx` before a tool executes; deny or approval-required decisions raise `PermissionError`. The PR was closed, not merged, and I do not claim ownership of the later job-based redesign.",
             followUps: [
               {
                 q: "One PR—how significant was that really?",
-                a: "Significant enough to be merged into a production open-source codebase after review. Understanding Cordum's architecture well enough to redesign a core pipeline—not just fix a bug—required deep codebase study. The 26/26 test pass rate means I understood all the integration contracts. The async refactor is architecturally non-trivial: changing synchronous to asynchronous changes the consistency model."
+                a: "It was a concrete 142-line contribution across two files: a LangChain callback plus its package export. The meaningful part is understanding framework integration—LCEL-compatible `with_config()` and a legacy callback fallback—while being transparent that the PR was closed and its later redesign was not my implementation."
               },
               {
-                q: "What is a sidecar pattern?",
-                a: "A sidecar is a separate service/process deployed alongside the main application to provide supporting functionality without modifying the main service. Unlike a library (which requires code changes), a sidecar is a separate process communicating via a defined interface (HTTP, gRPC, socket). Cordum-langchain-guard runs as a separate Python process. It intercepts LangChain LLM calls and applies policy logic."
+                q: "How did your adapter communicate with Cordum?",
+                a: "It made an HTTP request with `httpx` to Cordum’s policy-evaluation endpoint. The callback sent topic, tenant, tool capability, and risk tags. The PR exposed both synchronous and asynchronous callback methods; it was not a separately deployed sidecar."
               },
               {
-                q: "What changes when you go from synchronous to asynchronous policy enforcement?",
-                a: "The consistency model. Synchronous: guaranteed that policy is checked before LLM call starts—no unauthorized calls ever execute. Asynchronous: LLM call might start before policy result returns—if policy denies, you need compensating logic (stop the execution, flag it). Async is faster but requires careful design of the 'deny after start' path."
+                q: "What happened after the PR was closed?",
+                a: "A later merged PR took a different job-based approach and publicly credited #263 as the design spark. The correct interview answer is to explain what I built and what I learned from the design change—not to claim that later architecture or its test results."
               }
             ]
           },
@@ -929,7 +929,7 @@
         items: [
           { q: "Tell me about yourself.", a: "Lead with: 'I'm a third-year EE student at NIT Jamshedpur, but my work is in backend systems and AI infrastructure.' Then: one sentence on Cordum contribution, one on strongest project (LLM Cost Guard/RAGOS), close with: 'I'm focused on building systems that are actually reliable at scale—which is why [Company] interests me.'" },
           { q: "Why EE if you want CS/AI?", a: "'EE and backend are the same problem at different abstraction levels. EE: optimize for power, signal noise, hardware constraints. Backend: optimize for CPU cycles, memory, network latency. My EE training gave me first-principles thinking I apply to every systems design problem. It's a superpower, not a detour.'" },
-          { q: "Your CGPA is 7.57—defend it.", a: "'I optimized for real engineering impact over exam scores. While maintaining a respectable CGPA in a rigorous EE program, I dedicated 30+ hours/week to building complex systems and competing nationally. My 26/26 integration tests at Cordum speak to engineering quality better than a textbook exam.'" },
+          { q: "Your CGPA is 7.57—defend it.", a: "'I balanced a rigorous EE curriculum with sustained project work, research, open-source contribution, and competitions. I prefer to show concrete work I can explain clearly—design choices, code, and evidence—rather than hide behind a single metric.'" },
           { q: "Biggest weakness?", a: "'I sometimes over-invest in understanding internals before building. I spent days reading HNSW papers before implementing ChromaDB for RAGOS. I've learned to balance 'understand deeply' with 'ship iteratively.'" }
         ]
       },

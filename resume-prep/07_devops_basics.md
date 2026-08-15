@@ -39,7 +39,7 @@
 ## CI/CD
 
 ### Q. What is CI/CD?
-**A:** Automates build, test, deploy. Ensures main branch is always stable. At Cordum, all 26 integration tests had to pass via CI before my PR could merge.
+**A:** Automates build, test, and deploy so the main branch stays releasable. In open source, CI gives maintainers a repeatable signal about whether a proposed change meets the project’s checks; do not claim a particular CI result unless it belongs to your own PR.
 
 ### Q. GitHub Actions?
 **A:** YAML in `.github/workflows/`. Triggers: `push`/`pull_request` to `main`. Runner: `ubuntu-latest`. Steps: checkout → setup Python → install deps → lint → pytest. RAGOS has `ci.yml`, LLM Cost Guard has `main.yml`.

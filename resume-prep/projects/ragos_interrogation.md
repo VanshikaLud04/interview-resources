@@ -12,7 +12,7 @@
 **Answer:** I use a plugin-based architecture and a configuration schema (`schema.py`). The optimizer generates a generic config dictionary, and the specific plugin adapter unpacks those parameters (like `top_k` or `similarity_threshold`) before passing them to the underlying implementation.
 
 ### Follow-up: How exactly does the system know which parameters are valid for a specific plugin?
-**Answer:** > **Needs candidate-specific confirmation**. Each plugin registers its hyperparameter search space (e.g., bounds for chunk size, categorical choices for embedders) in `dimensions.py`. The optimizer only samples from these registered dimensions.
+**Answer:** `dimensions.py` defines five explicit search dimensions: chunking (three fixed size/overlap choices), retrieval (dense or hybrid with `top_k` choices), embedding (MiniLM or BGE-large), reranking (off or a cross-encoder), and generation (Phi-3, Mistral, GPT-4o, or Gemini Flash). The optimizer samples only from this fixed catalog; plugins do not dynamically register their own search spaces in the current public implementation.
 
 ### Follow-up: What if a parameter combination is fundamentally invalid, like trying to use a sparse retriever with a dense embedding model?
 **Answer:** The constraints engine (`constraints.py`) validates configurations before executing a trial. If a combo is invalid, it throws a `ConstraintViolationError` and the optimizer skips it or assigns it a zero score without running the expensive LLM calls.
@@ -34,7 +34,7 @@
 **Answer:** Grid Search explodes combinatorially (e.g., 5 chunk sizes × 3 embedders × 4 top-k = 60 configs; adding one more dimension makes it 300). Random Search finds near-optimal solutions much faster in high-dimensional spaces because not all hyperparameters are equally important. Bayesian Optimization was too complex to implement initially given the categorical nature of many parameters (like choosing an LLM).
 
 ### Follow-up: You evaluated 100+ configurations. How long did that take end-to-end?
-**Answer:** > **Needs candidate-specific confirmation**. Running 100 configurations over a dataset of 50 evaluation questions takes about [X hours]. The bottleneck is the LLM generation and evaluation steps.
+**Answer:** The code and repository do not record a reproducible wall-clock result for the 100+ runs, so I do not quote an invented duration. The dominant work is remote/local generation plus evaluation; I would rerun the exact dataset and configuration with timing logs before giving a number.
 
 ### Follow-up: If the LLM is the bottleneck, how did you speed up the evaluation?
 **Answer:** I utilized Python's `asyncio` to run independent trial queries concurrently. I also implemented semantic caching (`semantic_cache.py`) so identical LLM calls across different configs (e.g., same retrieved context and prompt) don't hit the API twice.
@@ -43,7 +43,7 @@
 **Answer:** Random search might pick the same chunk size and top-k, but change the generator LLM (e.g., Claude instead of GPT-4). The retrieval step is cached, saving embedder API calls and vector search time. Or if generation is the same but prompt changes, we still cache the retrieval output.
 
 ### Follow-up: How exactly does `semantic_cache.py` work? Is it an exact string match?
-**Answer:** > **Needs candidate-specific confirmation**. It hashes the query and the exact retrieved context. If both match, it returns the cached generation. For purely semantic caching of queries, we'd use vector similarity, but for experiments, exact hashing of inputs ensures deterministic evaluation.
+**Answer:** It is semantic, not an exact hash cache. `SemanticCache` keeps query embeddings, model name, and answer in memory; it calculates cosine similarity against entries for the same model and returns the closest answer only when similarity is at least `0.90`. It is a local showcase cache, so it is not durable or shared across workers.
 
 ### Follow-up: What if the API rate limits you because of your async concurrency?
 **Answer:** The `runner.py` uses `asyncio.Semaphore` to limit concurrent API calls. LiteLLM also handles basic retry logic with exponential backoff for HTTP 429 Too Many Requests errors.
@@ -187,7 +187,7 @@
 **Answer:** Neither. A is better in accuracy; B is better in cost. Both belong on the Pareto frontier. The user must choose based on their business preference.
 
 ### Follow-up: How do you handle noise? If Accuracy varies by +/- 2% between runs, your frontier might be calculating based on statistical noise.
-**Answer:** > **Needs candidate-specific confirmation**. I would compute confidence intervals for the metrics across multiple query runs. If the difference between A and B is not statistically significant (p > 0.05 via a t-test), I treat them as tied for that metric, or I run more evaluations to reduce the variance.
+**Answer:** The current Pareto implementation does not repeat trials or calculate confidence intervals; it ranks the recorded point estimates. That is a known limitation. A production extension would repeat configurations, retain distributions, and only distinguish candidates when their confidence intervals separate.
 
 ---
 
@@ -288,7 +288,7 @@ Response: Returns HTTP 202 Accepted with `{"experiment_id": 123, "status": "runn
 **Answer:** Not for a global optimum. Random Search does not guarantee a global optimum. However, empirical studies in hyperparameter tuning (like Bergstra and Bengio, 2012) show that Random Search can find configurations within 5% of the optimum using just 60 trials, because usually only a few dimensions truly matter.
 
 ## Q. "How reliable is your LLM-as-a-judge? Did you measure correlation with human scores?"
-**Answer:** > **Needs candidate-specific confirmation**. In a production setup, I would run a baseline set of 100 queries evaluated by humans, run the LLM judge on them, and calculate the Pearson or Spearman correlation coefficient. If correlation > 0.8, the judge is trusted.
+**Answer:** No human-correlation study is implemented or stored in the public repository. The current judge is a deterministic-prompt, temperature-zero GPT-4o faithfulness check. Before relying on it for model selection in production, I would build a human-labelled calibration set and measure agreement; I would not claim that validation has already happened.
 
 ---
 

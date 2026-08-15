@@ -16,7 +16,7 @@ This document provides a 7-level defense for every significant technology on the
 
 ### Level 2 — Project-Specific
 **Q: Why did you use Redis in your project?**
-**A:** > **Needs candidate-specific confirmation** I used Redis in LLM Cost Guard for distributed rate-limiting using the token bucket algorithm, and in RAGOS for caching API usage metrics.
+**A:** In LLM Cost Guard, Redis backs the atomic reserve-and-reconcile token limiter and the hot semantic cache. RAGOS does not use Redis in the public codebase; its showcase cache is an in-memory cosine-similarity cache, so I would not claim Redis usage there.
 
 #### Follow-up: Why not do rate limiting in Postgres?
 **A:** Postgres hits disk and has transactional overhead. For rate limiting, I need sub-millisecond checks before routing requests. Redis does this entirely in RAM.
@@ -81,7 +81,7 @@ This document provides a 7-level defense for every significant technology on the
 
 ### Level 2 — Project-Specific
 **Q: Why did you use Docker?**
-**A:** > **Needs candidate-specific confirmation** To ensure consistency between my Mac development environment and the Linux production server for the FastAPI backend and workers.
+**A:** I used Docker Compose to run the local multi-service stack reproducibly: API, Postgres, Redis, RabbitMQ, and Celery worker for Cost Guard; RAGOS also includes a Compose setup. I do not describe this as a deployed Linux production environment.
 
 #### Follow-up: Did you use docker-compose?
 **A:** Yes, for local development, I used `docker-compose` to spin up FastAPI, Postgres, and Redis simultaneously with a single command.
@@ -128,7 +128,7 @@ This document provides a 7-level defense for every significant technology on the
 
 ### Level 2 — Project-Specific
 **Q: Why use Postgres in your project?**
-**A:** > **Needs candidate-specific confirmation** For LLM Cost Guard, billing data requires absolute accuracy and relational integrity. I also used `pgvector` for embedding storage, avoiding a separate vector DB.
+**A:** In Cost Guard, Postgres is the durable store for policies, usage records, API-key-related entities, and cache entries; the model includes a vector field for durable semantic-cache storage. RAGOS uses Postgres for experiment/metric persistence and ChromaDB as its vector store, so I would not say RAGOS used pgvector instead of ChromaDB.
 
 ### Level 3 — Mechanism
 **Q: How does Postgres handle concurrent transactions?**
@@ -172,7 +172,7 @@ This document provides a 7-level defense for every significant technology on the
 
 ### Level 2 — Project-Specific
 **Q: Where did you use FastAPI?**
-**A:** > **Needs candidate-specific confirmation** It was the main API gateway in RAGOS, handling incoming query requests and orchestrating DB and LLM calls.
+**A:** FastAPI is the API layer in RAGOS: its route modules expose dataset, experiment, evaluation, query, ingest, feedback, and health endpoints, while services perform the database and LLM work behind those routes.
 
 ### Level 3 — Mechanism
 **Q: How does validation work?**
@@ -207,7 +207,7 @@ This document provides a 7-level defense for every significant technology on the
 
 ### Level 2 — Project-Specific
 **Q: How did you use Kubernetes?**
-**A:** > **Needs candidate-specific confirmation** I used it to deploy the microservices (API, workers). I wrote YAML manifests for Deployments, Services, and Ingress to manage the application lifecycle.
+**A:** Kubernetes is a learning/deployment skill on my resume, not a completed deployment I can prove from these public repositories. The reproducible project setup is Docker Compose; for an interview, I would explain how I would translate that stack to Deployments, Services, Secrets, and health checks rather than claim an EKS deployment.
 
 ### Level 3 — Mechanism
 **Q: How does Kubernetes know to restart a container?**
@@ -242,7 +242,7 @@ This document provides a 7-level defense for every significant technology on the
 
 ### Level 2 — Project-Specific
 **Q: Why use a task queue?**
-**A:** > **Needs candidate-specific confirmation** In RAGOS, embedding generation and LLM calls take seconds. I can't block the FastAPI HTTP response for that long. I push a task to Celery, return a 202 status, and process the LLM call in the background.
+**A:** In LLM Cost Guard, Celery uses RabbitMQ as broker and Redis as result backend. The gateway dispatches persistence work such as usage-record and cache-entry writes to workers, keeping that I/O outside the request path. RAGOS uses asyncio for parallel trials; it does not use Celery in the public codebase.
 
 ### Level 3 — Mechanism
 **Q: How does a task get executed?**
@@ -336,7 +336,7 @@ This document provides a 7-level defense for every significant technology on the
 
 ### Level 2 — Project-Specific
 **Q: How did you use them in Focus Lock?**
-**A:** > **Needs candidate-specific confirmation** I used OpenCV to capture frames, MediaPipe for fast facial landmark detection (mesh), and YOLOv8 for more robust bounding box detection when needed.
+**A:** Focus Lock uses OpenCV for camera capture and frame-difference calculation, YOLOv8n for object detection, and MediaPipe face mesh/head-pose estimation. The sampler decides whether a frame proceeds to the heavier YOLO-plus-gaze path based on motion entropy.
 
 ### Level 3 — Mechanism
 **Q: What is Non-Maximum Suppression (NMS)?**
@@ -396,7 +396,7 @@ This document provides a 7-level defense for every significant technology on the
 
 ### Level 1 — Basic
 **Q: What AWS services are you familiar with?**
-**A:** > **Needs candidate-specific confirmation** EC2 for virtual servers, S3 for object storage, RDS for managed databases, and IAM for identity/security.
+**A:** I know the purpose of EC2, S3, RDS, and IAM, but I do not have a public project deployment proving hands-on AWS operation. I present this as working knowledge, not production AWS ownership.
 
 ### Level 3 — Mechanism
 **Q: What is an S3 bucket?**
@@ -439,10 +439,10 @@ This document provides a 7-level defense for every significant technology on the
 *(Defensive coverage - Acknowledge specific usage rather than deep expertise if not primary)*
 
 **Q: Where did you use C++?**
-**A:** > **Needs candidate-specific confirmation** Primarily for hardware/firmware integration (like ArduPilot), focusing on memory management via pointers and basic standard template library (STL) usage.
+**A:** My resume supports that I built Python/C++ simulation pipelines in the ArduPilot ecosystem, but the project source is not in this repository. I should describe only the C++ module or change I can open and explain; until then, I position C++ as a working language rather than claiming firmware modifications.
 
 **Q: Where did you use JavaScript?**
-**A:** > **Needs candidate-specific confirmation** For basic frontend interactions or scripting, understanding the V8 event loop and async/await, though my primary backend focus is Python.
+**A:** I used JavaScript in the RAGOS React frontend and the Focus Lock browser dashboard. My primary strength is Python/backend work, so I would answer JavaScript questions at the level I have implemented rather than claim deep V8-runtime expertise.
 
 ---
 **End of Document**
@@ -465,7 +465,7 @@ This document provides a 7-level defense for every significant technology on the
 **A:** RDB takes point-in-time snapshots of the dataset at specified intervals. AOF (Append Only File) logs every write operation received by the server. RDB is faster to restart from but can lose minutes of data. AOF is more durable (fsync every second) but results in a larger file and slower restarts.
 
 #### Follow-up: Which one did you use?
-**A:** > **Needs candidate-specific confirmation** For rate-limiting in Cost Guard, data loss on restart is acceptable (users get a fresh quota), so RDB is sufficient. For critical state, we would enable both.
+**A:** The public Docker setup uses the stock Redis image and does not configure RDB or AOF. I would not claim a persistence choice; for durable quota accounting, the project’s design keeps authoritative records in Postgres and uses Redis for fast operational state.
 
 #### Lua Scripting Deep Dive
 **Q: Why use Lua scripts in Redis?**
@@ -581,7 +581,7 @@ This document provides a 7-level defense for every significant technology on the
 
 #### LLM Evaluation Deep Dive
 **Q: How did you evaluate the LLM outputs in your project?**
-**A:** > **Needs candidate-specific confirmation** I used a framework to evaluate based on Faithfulness (is the answer derived only from the retrieved context?) and Answer Relevance (does it actually address the user's query?). We log these metrics over time to catch regressions when tweaking prompts or models.
+**A:** RAGOS implements an `LLMJudge` that calls GPT-4o at temperature 0 to judge whether an answer is faithful to the retrieved context; it returns a binary score. The public implementation does not establish human-score correlation or a logged answer-relevance metric, so I present those as future evaluation work, not completed results.
 
 ### 11. System Design - Deep Dive
 

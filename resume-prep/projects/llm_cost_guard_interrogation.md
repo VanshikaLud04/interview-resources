@@ -160,8 +160,8 @@
 
 ### Docker / Kubernetes / AWS
 
-## Q. > **Needs candidate-specific confirmation** You mention Kubernetes and AWS. What exactly did you deploy?
-**Answer:** I containerized the FastAPI app, Celery workers, and defined standard Kubernetes manifests (Deployments, Services, ConfigMaps). I deployed this on EKS (Elastic Kubernetes Service). *[Adjust based on actual truth: If just local minikube/docker-compose, state that frankly: "I used docker-compose for local orchestration and wrote K8s manifests targeting EKS, though production deployment was simulated."]*
+## Q. You mention Kubernetes and AWS. What exactly did you deploy?
+**Answer:** The public repository proves a local Docker Compose stack: FastAPI API, Celery worker, Postgres, Redis, and RabbitMQ. It does not contain Kubernetes manifests, Terraform, or AWS deployment configuration, so I do not claim an EKS/AWS deployment. I can explain how I would deploy this stack on Kubernetes, but I keep that separate from what I built.
 
 ---
 
@@ -225,7 +225,7 @@
 ## SECTION 9: OWNERSHIP & ATTACK MODE
 
 ## Q. "You said you 'Scaled request handling via async task queues'. Did you actually face a scaling bottleneck, or did you just add Celery because it's a standard pattern?"
-**Answer:** > **Needs candidate-specific confirmation** "Initially, I built it synchronously. During load testing with Locust, I observed that writing the usage logs to Postgres took 20-50ms. Under 1000 concurrent requests, this DB blocking caused the FastAPI event loop to stall, pushing P99 latency up by 400ms. By moving the log writing to Celery, I removed that DB wait time from the API critical path, bringing P99 latency back down to just the Redis + LLM network time."
+**Answer:** I added Celery-backed persistence because usage-record and cache-entry writes are not on the synchronous request path. The code dispatches these writes to workers via RabbitMQ, with Redis as Celery result backend. The repository does not contain a before/after experiment that proves a 20-50ms database delay or a 400ms P99 regression, so I explain the architectural reason without inventing measured bottleneck numbers.
 
 ---
 

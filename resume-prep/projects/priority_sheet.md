@@ -224,21 +224,21 @@ Risk: 1=recoverable, 2=awkward, 3=immediate credibility damage
 - Perfect for a local desktop app.
 - Zero setup required for the user.
 
-### Q26. [Score: 0.9] Refactoring Sync to Async (Cordum)
-**Question:** How did you change the pipeline to async?
-**Why ranked here:** Good software engineering story.
+### Q26. [Score: 0.9] Cordum Policy Callback (Accurate Contribution)
+**Question:** What did your Cordum PR actually implement?
+**Why ranked here:** The public PR is inspectable, so accuracy matters more than an impressive story.
 **Perfect answer in 3 bullets:**
-- Replaced blocking HTTP calls with `aiohttp`/`httpx`.
-- Used `asyncio.gather` for parallel requests.
-- Prevented the sidecar from blocking the main application.
+- Added a LangChain `govern()` helper and callback-based policy check.
+- Called `/api/v1/policy/evaluate` through `httpx` before tool execution.
+- Supported sync and async callback paths; deny/approval decisions raise `PermissionError`.
 
-### Q27. [Score: 0.9] Integration Testing
-**Question:** How did you write integration tests for Cordum?
-**Why ranked here:** QA practices.
+### Q27. [Score: 0.9] Open-Source Honesty
+**Question:** Was the Cordum PR merged, and what did you learn?
+**Why ranked here:** A direct public-source check can expose an inaccurate answer.
 **Perfect answer in 3 bullets:**
-- Spun up test databases.
-- Mocked external APIs.
-- Tested the full request lifecycle end-to-end.
+- PR #263 was closed, not merged; do not claim the later merged #264 as yours.
+- Explain the two files and 142 lines you added, plus LCEL/legacy callback compatibility.
+- Say the later design credited the PR as inspiration, then move to what you learned from the integration.
 
 ### Q28. [Score: 0.9] Hardware / C++ Integration
 **Question:** How do Python and C++ interact in OpenCV?

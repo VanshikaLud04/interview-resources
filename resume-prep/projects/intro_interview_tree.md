@@ -574,5 +574,5 @@
 | **FocusFSM** | Focus Lock | LOW | What is a Finite State Machine? How do you prevent rapid toggling? |
 | **Flask-WebSocket** | Focus Lock | MED | How do WebSockets differ from HTTP REST? Why use them here? |
 | **SQLite** | Focus Lock | LOW | Why SQLite instead of Postgres here? (Local, embedded, serverless). |
-| **Cordum** | Cordum Sidecar | HIGH | What is the Sidecar pattern? How did you refactor sync to async pipelines? |
-| **Integration Tests** | Cordum | MED | Difference between unit and integration tests? How did you mock external services? |
+| **Cordum** | Public PR #263 | HIGH | What did the LangChain policy callback do? How did it call the policy endpoint? Why was the PR closed rather than merged? |
+| **Open-source review** | Cordum PR #263 | MED | What did you add versus what existed? What did you learn from adapting to a changed design direction? |

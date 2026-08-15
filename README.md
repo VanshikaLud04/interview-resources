@@ -4,7 +4,7 @@
 
 ## 📱 Study Hub App
 
-Open the [installable Interview Hub](https://vanshikalud04.github.io/interview-resources/) on a phone or desktop browser. After the first online load, it can run from your home screen/app launcher and keeps its study shell available offline.
+The installable app source is in [`study-app/`](study-app/). The included GitHub Pages workflow publishes it to `https://vanshikalud04.github.io/interview-resources/` once GitHub Pages is enabled for this repository with **Source: GitHub Actions**. After the first online load, it can run from your home screen/app launcher and keeps its study shell available offline.
 
 ---
 
@@ -87,7 +87,7 @@ Comprehensive, interview-ready Q&A with diagrams, follow-up chains, scenario bre
 | [RAGOS Interrogation](resume-prep/projects/ragos_interrogation.md) | 302 | All 4 bullets deconstructed, architecture, tech defense, attack mode |
 | [LLM Cost Guard Interrogation](resume-prep/projects/llm_cost_guard_interrogation.md) | 235 | Redis Lua deep dive, TOCTOU, concurrency testing, provider abstraction |
 | [Focus Lock Interrogation](resume-prep/projects/focus_lock_interrogation.md) | 379 | Shannon entropy math, YOLOv8 internals, threading/GIL, metric defense |
-| [Experience Interrogation](resume-prep/projects/experience_interrogation.md) | 227 | Cordum OSS + Research — ownership, attack mode, bridges |
+| [Experience Interrogation](resume-prep/projects/experience_interrogation.md) | Evidence-backed | Cordum OSS + Research — verified ownership, safe interview framing, and research boundaries |
 | [Technology Defense](resume-prep/projects/technology_defense.md) | 601 | ALL 18+ resume technologies at 7 levels (Basic→Scaling) |
 
 ### 🎯 Start Here — Interview Tree & Priority Sheet

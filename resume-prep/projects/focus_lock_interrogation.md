@@ -6,18 +6,15 @@
 
 ### Follow-up: How did you measure this? Did you use a standard dataset or build your own?
 
-**Answer:** > **Needs candidate-specific confirmation** 
-I evaluated it on a custom benchmark suite using the `benchmarks/eval_metrics.py` script. I recorded controlled session videos—some with continuous focus, some with intentional distractions (looking at a phone, turning around, leaving the desk). I manually annotated the timestamps for true distraction events to establish a ground truth.
+**Answer:** The repository includes `benchmarks/eval_metrics.py`, which computes per-class precision, recall, and F1 from ground-truth and prediction JSON files. However, the public repository does not include those input files or an annotation protocol. I can describe the script, but I should not claim a custom recording/annotation process unless I retain the underlying data and can show it.
 
 #### Follow-up: Manual annotation is prone to error and small sample sizes. How many frames or hours of video did you actually evaluate to get this 97.2% figure?
 
-**Answer:** > **Needs candidate-specific confirmation** 
-The evaluation set consisted of roughly 4 hours of test footage across different lighting conditions and angles, equating to roughly 430,000 frames at 30 FPS. While not a massive academic dataset, it was strictly segregated from the development testing and captured the specific edge cases (backlighting, side-profiles) the application faces in real-world desktop environments.
+**Answer:** I do not have a public raw dataset or reproducible frame/hour count in the repository. The README states 9,300+ labelled frames, but until the ground-truth and prediction artifacts are preserved and rerunnable, I treat the 97.2% number as a resume claim needing evidence—not as an academic benchmark I can elaborate with invented hours or split details.
 
 ##### Follow-up: What was your precision on that same dataset? And your F1 score?
 
-**Answer:** > **Needs candidate-specific confirmation** 
-Precision was lower, hovering around 89%. This means when the system flagged a distraction, it was correct 89% of the time. The F1 score, the harmonic mean of precision and recall, was approximately 93%. The lower precision was an explicit tradeoff; the FSM debouncing logic was tuned to aggressively catch phone usage, which occasionally triggered false positives when the user rested their chin on their hand in a way that mimicked holding a phone.
+**Answer:** The README records `DISTRACTED` precision `0.482`, recall `0.972`, and F1 `0.645`; those are the only project-specific figures documented. They show a high-recall, low-precision trade-off. Because the raw inputs are absent, I should not present the values as independently reproduced, and I must not replace them with the unsupported 89% / 93% figures.
 
 ###### Follow-up: You used YOLOv8 and MediaPipe. Which model handled the 97.2% recall?
 
@@ -33,23 +30,19 @@ Precision was lower, hovering around 89%. This means when the system flagged a d
 
 ######### Follow-up: What YOLOv8 variant did you use, and how did you hit <30ms latency?
 
-**Answer:** > **Needs candidate-specific confirmation** 
-I used the YOLOv8-Nano (YOLOv8n) variant, which has around 3.2 million parameters. To hit <30ms (which translates to >33 FPS), the model was exported to ONNX/OpenVINO format. The inference was run on the CPU/integrated GPU using the OpenVINO runtime or ONNXRuntime. 30ms is just the inference step; total frame time was kept low by offloading analytics to a separate thread via the EventBus.
+**Answer:** The checked-in configuration specifies `yolov8n.pt` at confidence `0.45`. The code chooses an available device automatically; it does not show an ONNX/OpenVINO export path. The public latency profiler currently uses a `time.sleep(0.01)` stub rather than real model inference, so I can explain the intended architecture but cannot use that script as proof of <30ms performance.
 
 ########## Follow-up: 30ms is just YOLO. MediaPipe face mesh also takes time. What was the total per-frame pipeline latency?
 
-**Answer:** > **Needs candidate-specific confirmation** 
-Total critical path latency per sampled frame was roughly 45-50ms. YOLOv8n took ~25ms, MediaPipe Face Mesh took ~15ms, and the FSM/Event generation took <5ms. However, because we used Shannon entropy to dynamically adapt the sampling rate, we rarely processed 30 frames per second. We skipped YOLO/MediaPipe entirely on low-entropy (static) frames, meaning average pipeline latency across a 1-hour session was functionally much lower.
+**Answer:** No end-to-end per-frame latency breakdown is captured in the public benchmark artifacts. The sound answer is architectural: a sampled frame goes through YOLO, MediaPipe/gaze, scoring, FSM, and non-blocking event publication; analytics and SQLite persistence are downstream. I should measure and report each stage before quoting a total.
 
 ########### Follow-up: What hardware exactly was this evaluated on?
 
-**Answer:** > **Needs candidate-specific confirmation** 
-It was evaluated on an Apple M1 Pro chip with 16GB of Unified Memory. The M-series chips excel at ONNXRuntime CPU execution due to their massive memory bandwidth and efficient ARM cores, which allowed YOLOv8n to hit those numbers without needing discrete GPUs.
+**Answer:** The README labels the empirical table “Apple M2,” while the checked-in code does not record a machine model. I should only name the exact machine from the benchmark run once I have its recorded environment; I do not substitute an M1 Pro or imply ONNXRuntime evidence that is not in the repository.
 
 ############ Follow-up: What if the user is running an older Intel Mac? Does the <30ms latency hold up?
 
-**Answer:** > **Needs candidate-specific confirmation** 
-On an older Intel Mac (e.g., 2019 Core i7), the YOLO inference time increases to roughly 60-80ms per frame. However, the application remains usable because the Shannon entropy sampler prevents the pipeline from processing every frame. The UI might lag slightly during periods of heavy motion, but the event-driven architecture ensures the main OS thread isn't blocked.
+**Answer:** I have no checked-in Intel-Mac benchmark, so I do not quote a latency range. The design should reduce inference frequency on static scenes regardless of hardware, but hardware-specific performance requires a separate measured run.
 
 ## Q. Your third bullet mentions applying Shannon entropy to dynamically adapt inference frames and slash CPU consumption by 93%. What is Shannon entropy?
 
@@ -69,8 +62,7 @@ On an older Intel Mac (e.g., 2019 Core i7), the YOLO inference time increases to
 
 ###### Follow-up: What was the threshold you used for entropy, and how did you tune it?
 
-**Answer:** > **Needs candidate-specific confirmation** 
-I tuned it empirically by logging entropy values during baseline sessions in `benchmarks/latency_profile.py`. I found that static sitting produced entropy values below 1.5 bits, while picking up a phone or turning the head spiked it above 3.5 bits. I set a threshold around 2.0. If the difference entropy was below 2.0, the sampler skipped the YOLO and MediaPipe inference step entirely and just reused the previous frame's state.
+**Answer:** The sampler has no fixed entropy threshold. It maps entropy continuously to an interval between `0.2s` and `3.0s`, then smooths that interval with an EMA of `0.25`. High entropy shortens the interval; low entropy lengthens it. The checked-in latency profiler does not log entropy values, so I do not invent bit thresholds.
 
 ####### Follow-up: You claim a 93% CPU reduction. What was the baseline and what exactly are you measuring?
 
@@ -82,8 +74,7 @@ I tuned it empirically by logging entropy values during baseline sessions in `be
 
 ######### Follow-up: What profiling tool did you use to measure the 93%?
 
-**Answer:** > **Needs candidate-specific confirmation** 
-I used `cProfile` wrapped in a custom decorator to profile the main inference loop, dumping the output to `pstats`. I visualized the call stack with SnakeViz. The cumulative execution time of the `yolo_detector.forward()` function dropped by 93% when the entropy gate was active compared to when it was disabled.
+**Answer:** The public repository does not contain a `cProfile`/SnakeViz artifact or a real inference profiler that establishes the 93% figure. The sampler code does establish the mechanism for reducing inference frequency. Before defending a 93% reduction, I need a reproducible before/after run with the exact measurement method and raw outputs.
 
 
 ## SECTION 2: COMPUTER VISION DEEP DIVE
@@ -181,11 +172,7 @@ I used `cProfile` wrapped in a custom decorator to profile the main inference lo
 
 ### Follow-up: How did you design the schema for storing continuous telemetry data?
 
-**Answer:** > **Needs candidate-specific confirmation** 
-I used two main tables in `data/database.py`. 
-1. `sessions`: Tracks the start and end time of a focus block. (Columns: `id`, `start_time`, `end_time`)
-2. `attention_events`: Stores the granular telemetry. (Columns: `id`, `session_id`, `timestamp`, `state` [FOCUSED/DISTRACTED], `focus_score`, `entropy`). 
-I indexed `session_id` and `timestamp` heavily to optimize the queries used by the analytics dashboard to generate heatmaps.
+**Answer:** `database.py` creates `sessions`, `events`, `attention_events`, `daily_summary`, and `weekly_summary`. `attention_events` records session, timestamp, state, trigger, confidence, active app, FPS, CPU/RAM, face/phone flags, and gaze angles. The database indexes `session_id` and timestamp columns for `events` and `attention_events`, and enables WAL mode on connections.
 
 #### Follow-up: Writing to a database on a disk at 30 FPS will destroy performance. How did you optimize this?
 
@@ -293,8 +280,7 @@ I indexed `session_id` and `timestamp` heavily to optimize the queries used by t
 
 #### Follow-up: "You claim <30ms inference latency. Prove it. What hardware did you test this on, and how did you profile it?"
 
-**Answer:** > **Needs candidate-specific confirmation** 
-I profiled it using Python's `cProfile` and custom `time.perf_counter()` wrappers in `benchmarks/latency_profile.py`. I tested this on an Apple Silicon Mac (M1/M2). The 30ms latency is specifically the execution time of the `yolo_detector.py` forward pass using the CoreML/OpenVINO backend. The total frame processing time is longer, but 30ms is the bottleneck step. I log this metric in the telemetry database to monitor thermal throttling over long sessions.
+**Answer:** The repo includes a latency-profile scaffold using `time.perf_counter`, but its actual model invocation is commented out and replaced with `time.sleep(0.01)`. Therefore it cannot substantiate <30ms or a CoreML/OpenVINO path. I should describe this as benchmark scaffolding and rerun it with real inference before making performance claims.
 
 
 ## SECTION 9: ARCHITECTURE CRITIQUE & FUTURE WORK
@@ -310,8 +296,7 @@ Additionally, I would replace Python threads with Python `multiprocessing` combi
 
 #### Follow-up: You mentioned quantization earlier. Why didn't you deploy an INT8 quantized YOLO model?
 
-**Answer:** > **Needs candidate-specific confirmation** 
-I evaluated INT8 quantization. While it reduced model size and inference time on standard CPUs, I found it caused a significant drop in precision for small objects, specifically detecting phones held at odd angles. The recall dropped from 97.2% to below 90%. Given our priority was catching distractions, the accuracy loss outweighed the latency gain, especially since the Shannon entropy sampler already reduced our CPU load by 93% anyway.
+**Answer:** INT8 quantization is not implemented or benchmarked in the public repository. I should not claim an observed accuracy drop or a model-selection experiment. A defensible future-work answer is that I would benchmark FP32 and INT8 on the same labelled set, comparing recall, precision, and latency before deciding.
 
 ##### Follow-up: Explain how INT8 quantization actually causes that precision drop mathematically.
 
@@ -352,8 +337,7 @@ I evaluated INT8 quantization. While it reduced model size and inference time on
 **Answer:** This is a classic presentation attack (spoofing). MediaPipe face mesh will likely detect the face in the 2D photo and return landmarks. However, the system can mitigate this by checking for micro-movements (like blinking or slight head jitter) over time. If the landmarks remain perfectly static (entropy is exactly zero for an extended period), the system can flag it as a spoofing attempt.
 
 ### Follow-up: Did you implement this anti-spoofing mechanism?
-**Answer:** > **Needs candidate-specific confirmation**
-I didn't implement a dedicated liveness detection model due to CPU constraints, but I did implement a "static timeout." If the face mesh landmarks do not change by more than a 1-pixel variance over a 1-minute period, the FSM transitions to a "WARNING" state and requests the user to move, eventually degrading to DISTRACTED if ignored.
+**Answer:** No anti-spoofing or static-timeout mechanism is present in the public code. The honest answer is: “I did not implement liveness detection; a printed-photo attack is outside the project’s current threat model. A future version could add blink/temporal checks or a dedicated anti-spoof model.”
 
 ## Q. What if the user wears a mask or heavy sunglasses?
 **Answer:** Heavy sunglasses occlude the eye landmarks. MediaPipe face mesh confidence for the eye regions will drop significantly.
@@ -375,5 +359,4 @@ I didn't implement a dedicated liveness detection model due to CPU constraints, 
 
 #### Follow-up: What if someone walks behind the user and holds up a phone?
 **Answer:** YOLO will detect the phone, but the `geometry.py` intersection logic checks if the phone bounding box overlaps with the *primary* user's bounding box and is within the primary user's gaze vector. Since the secondary person's phone is outside this zone, it is ignored.
-
 
