@@ -49,6 +49,7 @@ Comprehensive, interview-ready Q&A with diagrams, follow-up chains, scenario bre
 |------|-------------|
 | [DSA Pattern Guide](coding/patterns.md) | 18 major patterns with templates, complexity, signal words, and Python code |
 | [Maths, Bits & Binary Search](coding/dsa_math_binary_companion.md) | C++-oriented binary-search boundaries, bit manipulation, number theory, modular arithmetic, combinatorics, geometry, and practice drills |
+| [PDF Pattern + Question Checklist](coding/pdf_dsa_question_companion.md) | Exact checklist of every named pattern and worked question from the supplied C++ DSA PDF, with the invariant, C++ move, and edge case for each |
 | [Questions by Company](coding/questions_by_company.md) | 1,700+ coding questions from 160+ companies with DSA pattern tags |
 
 ---
