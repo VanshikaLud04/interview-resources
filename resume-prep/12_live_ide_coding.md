@@ -203,6 +203,165 @@ Your DSA material already has the algorithm. The new practice is: create files, 
 
 ---
 
+## Practice Ladders: Variations So You Do Not Buffer
+
+Do **one ladder at a time**. Variant A is the base. Variant B changes one rule. Variant C adds one realistic production concern. If you can do A, B, and C on separate days without notes, the pattern becomes automatic.
+
+### Ladder 1: Dictionaries, Aggregation, and Validation
+
+**First line to say:** "I will validate each record at the boundary, aggregate in one pass, then make the return shape explicit."
+
+| Variant | Prompt | First implementation thought | Tests |
+|---|---|---|---|
+| A | Sum token usage by `org_id`. | `totals[org] = totals.get(org, 0) + tokens` | empty list; two events same org |
+| B | Return `{org_id: {requests, input_tokens, output_tokens}}`. | initialise a nested dict/dataclass once per org | missing numeric field; three orgs |
+| C | Ignore invalid events but return an error report. | return `(totals, errors)`; do not silently swallow | malformed JSON-like record; negative tokens |
+
+**Follow-up they may add:** "Return top 5." Finish aggregation first, then use `heapq.nlargest` or sorting. State `O(n + m log k)` for `m` organisations.
+
+### Ladder 2: Time Windows and Rate Limiting
+
+**First line to say:** "The invariant is that each user's deque contains only timestamps inside the active window."
+
+| Variant | Prompt | First implementation thought | Tests |
+|---|---|---|---|
+| A | At most 3 requests/user/minute. | `dict[str, deque[float]]` | exactly at limit; timestamp expires |
+| B | Different limits for free and paid tiers. | pass a `limit_for(user)` function; keep policy separate | unknown tier; limit 0 |
+| C | Return `retry_after` on deny. | oldest retained timestamp determines next allowed time | requests at exact boundary |
+
+**Production follow-up:** "How do you make it distributed?" Say shared state + atomic update in Redis; do not start coding Redis until the local behaviour is correct.
+
+### Ladder 3: Cache Logic
+
+**First line to say:** "I need to define cache freshness and the key before I choose the data structure."
+
+| Variant | Prompt | First implementation thought | Tests |
+|---|---|---|---|
+| A | Cache value for 30 seconds. | `key -> (expires_at, value)`, `time.monotonic()` | hit before expiry; miss after expiry |
+| B | Cache by two function arguments. | tuple key: `(user_id, model)` | same user, different model |
+| C | Cache max 100 entries. | add `OrderedDict` / LRU, evict least recent | capacity 1; refresh existing key |
+
+**Follow-up:** "What if 100 requests miss together?" Name cache stampede; use request coalescing/lock, stale-while-revalidate, or jitter depending on the requirement.
+
+### Ladder 4: Retries and External APIs
+
+**First line to say:** "I will retry only transient failures and only when repeating the operation is safe."
+
+| Variant | Prompt | First implementation thought | Tests |
+|---|---|---|---|
+| A | Retry a GET three times. | loop; catch timeout/temporary exception; re-raise last error | success on second call; all calls fail |
+| B | Use exponential backoff with jitter. | delay `base * 2**attempt + random jitter` | assert attempts, not sleep duration |
+| C | Retry a create request safely. | require an idempotency key; do not blindly repeat | response lost after server accepted request |
+
+**Do not say:** "I retry all exceptions." Validation/auth errors normally need a clear failure, not a retry storm.
+
+### Ladder 5: Async Fan-Out
+
+**First line to say:** "These are independent I/O operations, so concurrency helps, but I will bound it to protect the downstream service."
+
+| Variant | Prompt | First implementation thought | Tests |
+|---|---|---|---|
+| A | Fetch 10 independent profiles concurrently. | `asyncio.gather` | all success; one failure |
+| B | Fetch 1,000 with at most 20 in flight. | semaphore wrapper around the call | observed max concurrency <= 20 |
+| C | Return partial results after a deadline. | `wait_for`, per-item result/error shape | one slow dependency; cancellation |
+
+**Follow-up:** For CPU-heavy work, use a worker/process, not `asyncio.gather`; async does not make CPU work parallel.
+
+### Ladder 6: API Endpoints
+
+**First line to say:** "I will keep validation at the HTTP boundary and business logic in a testable function/service."
+
+| Variant | Prompt | First implementation thought | Tests |
+|---|---|---|---|
+| A | `POST /items` validates name and creates one item. | Pydantic request model + 201 response | blank name; valid name |
+| B | `GET /items` filters by status and paginates. | query params with bounds; deterministic sort | invalid status; empty page |
+| C | Same create endpoint must be idempotent. | accept `Idempotency-Key`, store/reuse prior result | retry with same key; same key/different body |
+
+**Follow-up:** Authentication is not `if user`; say dependency/middleware verifies identity, then service checks resource-level authorization.
+
+### Ladder 7: SQL and Data Access
+
+**First line to say:** "I will write the correct simple query first, then use the access pattern and `EXPLAIN ANALYZE` to justify an index."
+
+| Variant | Prompt | First implementation thought | Tests / checks |
+|---|---|---|---|
+| A | Spend per org in last 7 days. | `WHERE`, `GROUP BY`, `SUM` | no requests; null cost policy |
+| B | Include orgs with zero spend. | `orgs LEFT JOIN requests` with time filter in join condition | org with no records |
+| C | Return top spender per day. | aggregate then window `ROW_NUMBER()` partitioned by day | ties: choose `RANK` or deterministic tie-break |
+
+**Follow-up:** transactions are for related changes that must succeed/fail together; an index speeds reads but adds write/storage cost.
+
+### Ladder 8: Files and Streams
+
+**First line to say:** "I will stream records instead of reading an unbounded input into memory, and make malformed-input behaviour explicit."
+
+| Variant | Prompt | First implementation thought | Tests |
+|---|---|---|---|
+| A | Read `.jsonl` and count valid events. | loop file line-by-line, `json.loads` | empty file; malformed line |
+| B | Write rejected lines to a separate file. | keep input line number + error reason | bad UTF-8 / invalid JSON policy |
+| C | Process a 10 GB log. | same streaming loop; bounded aggregates | memory does not grow with file size |
+
+### Ladder 9: Debugging Code You Did Not Write
+
+**First line to say:** "Before changing code, I want a minimal reproduction and one observable hypothesis."
+
+| Variant | Symptom | First hypothesis / check | Fix direction |
+|---|---|---|---|
+| A | Async endpoint is slow. | blocking `requests.get()` / `time.sleep()` on event loop | async client or offload work |
+| B | Counter sometimes exceeds limit. | check-then-write race | one atomic operation / lock |
+| C | Memory rises over days. | unbounded cache/list or unreleased resource | profile, bound/evict, use context manager |
+
+Always end with: "I would add a regression test and metric/alert for this failure mode."
+
+### Ladder 10: C++ in an IDE, Not LeetCode
+
+**First line to say:** "I will define the class contract and invariants before I implement the methods."
+
+| Variant | Prompt | Core STL choice | Tests |
+|---|---|---|---|
+| A | `TaskQueue`: add tasks and pop highest priority. | `priority_queue` | empty queue; equal priority tie rule |
+| B | LRU cache with `get/put`. | `list<pair<K,V>>` + `unordered_map<K, iterator>` | update existing key; capacity one |
+| C | Thread-safe queue. | `queue`, `mutex`, `condition_variable` | producer/consumer; shutdown policy |
+
+If they ask C++ syntax you forget, write the class/function shape and state the intended invariant. Correct reasoning + a small lookup (if allowed) is far better than freezing.
+
+---
+
+## The "I Can Start Any Prompt" Scratch Template
+
+Copy this into a blank file during practice. It removes blank-screen panic.
+
+```python
+"""Restate: input -> output. Constraints: __. Edge cases: __."""
+
+def solve(data):
+    # 1. validate / initialise state
+    # 2. happy path
+    # 3. boundary behaviour
+    raise NotImplementedError
+
+
+def test_happy_path():
+    assert solve(...) == ...
+
+
+def test_edge_case():
+    assert solve(...) == ...
+```
+
+Then replace one comment at a time. The goal is motion, not brilliance in the first 20 seconds.
+
+## Anti-Buffer Drill (15 Minutes)
+
+1. Use a timer. Pick a random **Variant B or C** above.
+2. You get 60 seconds only to restate, choose an invariant, and write a signature/test.
+3. Code for 10 minutes.
+4. Use the final 4 minutes to add one edge test and give the production follow-up aloud.
+
+Repeat a ladder after two days with a different variant. Once you have done 20 such starts, unfamiliar IDE prompts stop feeling unfamiliar—they resolve into one of these shapes.
+
+---
+
 ## A Mini Mock: How It Should Sound
 
 **Interviewer:** "Implement a per-user limiter, then make it production-ready."
